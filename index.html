@@ -3,281 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Energy Cat Tycoon: EVOLUTION 2026</title>
+    <title>Energy Cat: Ultra Tycoon 2026</title>
     <style>
         :root { 
             --common: #bdc3c7; --rare: #3498db; --epic: #9b59b6; 
-            --mythic: #e67e22; --legendary: #f1c40f; --excl: #e74c3c;
+            --mythic: #e67e22; --legendary: #f1c40f; --plus: #00ffcc;
             --bg: #0d0d12; --panel: #1c1c24; 
         }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 70px; user-select: none; }
-        
-        /* Навигация */
-        .tabs { position: fixed; bottom: 0; width: 100%; background: var(--panel); display: flex; justify-content: space-around; padding: 10px 0; border-top: 2px solid #333; z-index: 1000; }
-        .tab-btn { background: none; border: none; color: #888; font-size: 12px; cursor: pointer; }
-        .tab-btn.active { color: var(--rare); font-weight: bold; }
-
-        /* Экраны */
-        .screen { display: none; padding: 20px; animation: fadeIn 0.3s; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; user-select: none; }
+        .tabs { position: fixed; bottom: 0; width: 100%; background: var(--panel); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; z-index: 1000; }
+        .tab-btn { background: none; border: none; color: #666; font-size: 11px; cursor: pointer; }
+        .tab-btn.active { color: var(--plus); font-weight: bold; }
+        .screen { display: none; padding: 20px; animation: fadeIn 0.2s; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Статистика */
-        .top-bar { background: var(--panel); padding: 15px; display: flex; justify-content: space-around; position: sticky; top: 0; z-index: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .stat-val { font-weight: bold; color: #ff9f43; }
-
-        /* Бойцы и Магазин */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .card { background: var(--panel); border-radius: 15px; padding: 15px; text-align: center; border: 1px solid #333; position: relative; }
-        .rarity-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; position: absolute; top: 5px; right: 5px; text-transform: uppercase; }
+        .top-bar { background: var(--panel); padding: 15px; display: flex; justify-content: space-between; position: sticky; top: 0; z-index: 900; }
         
-        /* Кнопка Кота */
-        .main-cat { font-size: 120px; margin: 40px auto; display: block; cursor: pointer; transition: 0.1s; width: fit-content; }
-        .main-cat:active { transform: scale(0.8); }
+        /* Кот */
+        .cat-btn { font-size: 100px; cursor: pointer; transition: 0.1s; display: block; margin: 30px auto; width: fit-content; }
+        .cat-btn:active { transform: scale(0.8); }
 
         /* Пасс и Квесты */
-        .pass-bar { background: #333; height: 20px; border-radius: 10px; margin: 10px 0; overflow: hidden; }
-        .pass-fill { height: 100%; background: linear-gradient(90deg, #f1c40f, #e67e22); width: 0%; transition: 0.5s; }
+        .pass-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 15px 0; scrollbar-width: none; }
+        .level-card { min-width: 120px; background: #222; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #444; }
+        .level-card.plus-active { border-color: var(--plus); box-shadow: 0 0 10px rgba(0,255,204,0.2); }
+        .quest-card { background: #1a1a20; padding: 12px; border-radius: 10px; margin-bottom: 8px; border-left: 4px solid var(--rare); }
         
-        .box-timer { font-size: 14px; color: #2ecc71; margin-top: 10px; }
-        .locked { filter: grayscale(1); opacity: 0.5; }
+        /* Сетки */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .fighter-card { background: #1c1c24; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #333; position: relative; }
+        .rarity-dot { position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; border-radius: 50%; }
+        .locked { filter: grayscale(1); opacity: 0.4; }
         
-        input[type="password"], input[type="text"] { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #0f0; border-radius: 8px; margin-top: 10px; }
+        button { padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+        .claim-btn { background: var(--plus); color: #000; width: 100%; margin-top: 5px; font-size: 10px; }
+        .claim-btn:disabled { background: #444; color: #888; }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <div>⚡ <span id="en-val" class="stat-val">0</span></div>
-        <div>💎 <span id="gem-val" style="color: #a55eea;">0</span></div>
-        <div>⭐ <span id="xp-val" style="color: #f1c40f;">0</span></div>
+        <div>⚡ <span id="en-val">0</span></div>
+        <div>💎 <span id="gem-val">0</span></div>
+        <div>⭐ XP: <span id="xp-val">0</span></div>
     </div>
 
-    <!-- ЭКРАН 1: КЛИКЕР -->
+    <!-- КЛИКЕР -->
     <div id="scr-click" class="screen active">
-        <div id="boss-zone" style="display:none; background: #4b1a1a; padding: 10px; border-radius: 10px; margin-bottom: 20px;">
-            <b id="boss-name">BOSS</b>
-            <div style="background:#222; height:10px; border-radius:5px;"><div id="boss-hp" style="height:100%; background:red; width:100%;"></div></div>
-        </div>
-        <div class="main-cat" id="cat-btn">🐱</div>
-        <h3 id="cat-rank">Обычный Котёнок</h3>
-        <p id="click-pwr">Сила клика: 1</p>
+        <div class="cat-btn" id="cat-main">🐱</div>
+        <h2 id="cat-rank">Котёнок</h2>
+        <div id="click-info">Сила: 1</div>
+        <hr style="opacity:0.1; margin:20px 0;">
+        <h3>Квесты дня</h3>
+        <div id="quest-container"></div>
     </div>
 
-    <!-- ЭКРАН 2: БОЙЦЫ -->
+    <!-- БОЙЦЫ -->
     <div id="scr-fighters" class="screen">
-        <h2>Мои Бойцы</h2>
-        <div class="grid" id="fighters-list">
-            <!-- Бойцы добавляются здесь -->
-        </div>
+        <h3>Коллекция (<span id="fighter-count">0</span>/16)</h3>
+        <div class="grid" id="f-grid"></div>
     </div>
 
-    <!-- ЭКРАН 3: МАГАЗИН И БОКСЫ -->
-    <div id="scr-shop" class="screen">
-        <h2>Магазин Боксов</h2>
-        <div class="grid">
-            <div class="card">
-                <b>Обычный Бокс</b><br><small>10,000 Энергии</small>
-                <button onclick="buyBox('energy')" style="width:100%; background:var(--rare); border:none; padding:8px; margin-top:5px; border-radius:5px;">Открыть</button>
-            </div>
-            <div class="card">
-                <div class="rarity-tag" style="background:var(--legendary); color:black;">BEST</div>
-                <b>Мега Бокс</b><br><small>250 Гемов</small>
-                <button onclick="buyBox('gem')" style="width:100%; background:var(--legendary); border:none; padding:8px; margin-top:5px; border-radius:5px;">Открыть</button>
-            </div>
-        </div>
-        <p class="box-timer" id="free-box-timer">Бесплатный бокс через: --:--</p>
-        <hr>
-        <div id="promo-area"></div>
-    </div>
-
-    <!-- ЭКРАН 4: ПАСС И КВЕСТЫ -->
+    <!-- ENERGY PASS -->
     <div id="scr-pass" class="screen">
-        <h2>Energy Pass</h2>
-        <div class="pass-bar"><div class="pass-fill" id="pass-progress"></div></div>
-        <p>Уровень: <span id="pass-lvl">1</span></p>
-        <div id="quest-list">
-            <!-- Квесты -->
+        <h2 style="color:var(--plus)">ENERGY PASS <span id="pass-lvl-text">Lvl 1</span></h2>
+        <div id="plus-btn-area"></div>
+        <div class="pass-scroll" id="pass-row"></div>
+        <div id="prestige-area" style="display:none; background:var(--panel); padding:15px; border-radius:15px; border:1px dashed var(--legendary);">
+            <b style="color:var(--legendary)">БОНУС ФИНИША</b><br>
+            <progress id="prestige-bar" value="0" max="2800" style="width:100%"></progress>
+            <p><small>Наберите 2800 XP для рандомного приза!</small></p>
         </div>
     </div>
 
-    <!-- ЭКРАН 5: АДМИНКА -->
-    <div id="scr-admin" class="screen">
-        <input type="password" id="adm-p" placeholder="Пароль доступа">
-        <input type="text" id="adm-c" style="display:none" placeholder="Введите код UP_...">
-        <button onclick="handleAdmin()" style="width:100%; padding:15px; margin-top:10px; background:#333; color:white; border:none; border-radius:10px;">ВВОД</button>
-        <br><br>
-        <button onclick="saveToTxt()" style="font-size:10px;">Сохранить в .txt</button>
-        <button onclick="document.getElementById('load-f').click()" style="font-size:10px;">Загрузить .txt</button>
-        <input type="file" id="load-f" style="display:none" onchange="loadFromTxt(event)">
+    <!-- МАГАЗИН -->
+    <div id="scr-shop" class="screen">
+        <h3>Магазин Боксов</h3>
+        <div class="grid">
+            <div class="fighter-card">📦 Обычный<button onclick="openBox('common')" style="background:var(--rare); color:white; width:100%">1,500 ⚡</button></div>
+            <div class="fighter-card">💎 Мегабокс<button onclick="openBox('mega')" style="background:var(--legendary); color:black; width:100%">80 💎</button></div>
+        </div>
+        <div id="special-offer" style="margin-top:20px"></div>
+    </div>
+
+    <!-- КОДЫ -->
+    <div id="scr-codes" class="screen">
+        <input type="text" id="code-in" placeholder="Введите код UP_...">
+        <button onclick="useCode()" style="width:100%; margin-top:10px; background:var(--plus); color:#000;">ПРИМЕНИТЬ</button>
+        <button onclick="saveTxt()" style="font-size:10px; margin-top:30px; opacity:0.3;">Save to TXT</button>
     </div>
 
     <div class="tabs">
-        <div class="tab-btn active" onclick="showScreen('scr-click', this)">КЛИК</div>
-        <div class="tab-btn" onclick="showScreen('scr-fighters', this)">БОЙЦЫ</div>
-        <div class="tab-btn" onclick="showScreen('scr-shop', this)">МАГАЗИН</div>
-        <div class="tab-btn" onclick="showScreen('scr-pass', this)">ПАСС</div>
-        <div class="tab-btn" onclick="showScreen('scr-admin', this)">АДМИН</div>
+        <div class="tab-btn active" onclick="tab('scr-click', this)">КЛИК</div>
+        <div class="tab-btn" onclick="tab('scr-fighters', this)">БОЙЦЫ</div>
+        <div class="tab-btn" onclick="tab('scr-pass', this)">ПАСС</div>
+        <div class="tab-btn" onclick="tab('scr-shop', this)">ШОП</div>
+        <div class="tab-btn" onclick="tab('scr-codes', this)">КОДЫ</div>
     </div>
 
 <script>
-    // --- ДАННЫЕ ИГРЫ ---
-    const RARITY = {
-        COMMON: { n: "Обычный", c: "#bdc3c7", price: 100 },
-        RARE: { n: "Редкий", c: "#3498db", price: 200 },
-        EPIC: { n: "Эпический", c: "#9b59b6", price: 300 },
-        MYTHIC: { n: "Мифический", c: "#e67e22", price: 400 },
-        LEGEND: { n: "Легенда", c: "#f1c40f", price: 500 },
-        EXCL: { n: "ЭКСКЛЮЗИВ", c: "#e74c3c", price: 9999 }
+    // --- БАЗА БОЙЦОВ ---
+    const DB = {
+        f1: { n: "Энергия Кот", r: "common", p: 1, i: "🐱" },
+        f2: { n: "H2", r: "common", p: 2, i: "💧" },
+        f3: { n: "Плащ", r: "rare", p: 5, i: "🧥" },
+        f4: { n: "Сильный Кот", r: "rare", p: 8, i: "💪" },
+        f5: { n: "Электро", r: "epic", p: 15, i: "⚡" },
+        f6: { n: "Лава", r: "epic", p: 20, i: "🔥" },
+        f7: { n: "Кибер-Кот", r: "mythic", p: 45, i: "🤖" },
+        f8: { n: "Призрак", r: "mythic", p: 60, i: "👻" },
+        f9: { n: "Зевс", r: "legendary", p: 150, i: "🔱" },
+        f10: { n: "Эксклюзив Эпик", r: "mythic", p: 200, i: "👑" },
+        f11: { n: "Эксклюзив Лега", r: "legendary", p: 400, i: "💎" },
+        f12: { n: "Атомный Кот", r: "legendary", p: 500, i: "☢️" },
+        f13: { n: "Кот-Бог", r: "legendary", p: 1000, i: "⛩️" },
+        f14: { n: "Ниндзя", r: "rare", p: 10, i: "🥷" },
+        f15: { n: "Космос", r: "mythic", p: 80, i: "🪐" },
+        f16: { n: "Пустота", r: "legendary", p: 777, i: "🌀" }
     };
-
-    const ALL_FIGHTERS = [
-        { id: 'f1', name: 'Энергия Кот', rarity: 'COMMON', power: 2, icon: '🐱' },
-        { id: 'f2', name: 'H2 Кот', rarity: 'RARE', power: 5, icon: '💧' },
-        { id: 'f3', name: 'Плащ-Кот', rarity: 'EPIC', power: 12, icon: '🧥' },
-        { id: 'f4', name: 'Сильный Энерго-Кот', rarity: 'MYTHIC', power: 30, icon: '💪' },
-        { id: 'f5', name: 'Кот-Зевс', rarity: 'LEGEND', power: 100, icon: '⚡' },
-        { id: 'f6', name: 'Эксклюзивный Эпик', rarity: 'EXCL', power: 250, icon: '👑' }
-    ];
 
     let g = {
-        energy: 0, gems: 0, xp: 0, 
-        fighters: ['f1'], 
-        passLvl: 1, 
-        lastBoxTime: Date.now(),
-        mult: 1, 
-        isAdmin: false
+        en: 0, gem: 0, xp: 0, 
+        owned: ['f1'], 
+        lvl: 1, 
+        plus: false, 
+        claimed: [], 
+        prestigeXP: 0,
+        q: { click: 0, target: 100 },
+        mult: 1
     };
 
-    // --- ЛОГИКА ---
-    function showScreen(id, btn) {
+    if(localStorage.getItem('CatV2026_Ultra')) g = JSON.parse(localStorage.getItem('CatV2026_Ultra'));
+
+    function tab(id, b) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
+        b.classList.add('active');
     }
 
-    function updateUI() {
-        document.getElementById('en-val').innerText = Math.floor(g.energy).toLocaleString();
-        document.getElementById('gem-val').innerText = g.gems;
+    function ui() {
+        document.getElementById('en-val').innerText = Math.floor(g.en).toLocaleString();
+        document.getElementById('gem-val').innerText = g.gem;
         document.getElementById('xp-val').innerText = g.xp;
-        document.getElementById('pass-lvl').innerText = g.passLvl;
-        document.getElementById('pass-progress').style.width = (g.xp % 100) + '%';
+        document.getElementById('pass-lvl-text').innerText = "Уровень " + g.lvl;
         
-        // Рендер бойцов
-        const fList = document.getElementById('fighters-list');
-        fList.innerHTML = '';
-        ALL_FIGHTERS.forEach(f => {
-            const owned = g.fighters.includes(f.id);
-            fList.innerHTML += `
-                <div class="card ${owned ? '' : 'locked'}">
-                    <div class="rarity-tag" style="background:${RARITY[f.rarity].c}">${RARITY[f.rarity].n}</div>
-                    <div style="font-size:40px">${f.icon}</div>
-                    <b>${f.name}</b><br>
-                    <small>Урон: ${f.power}</small>
+        // Бойцы
+        let pwr = 0;
+        const grid = document.getElementById('f-grid'); grid.innerHTML = '';
+        Object.keys(DB).forEach(id => {
+            const f = DB[id];
+            const isOwned = g.owned.includes(id);
+            if(isOwned) pwr += f.p;
+            grid.innerHTML += `
+                <div class="fighter-card ${isOwned?'':'locked'}">
+                    <div class="rarity-dot" style="background:var(--${f.r})"></div>
+                    <div style="font-size:30px">${f.i}</div>
+                    <small>${f.n}</small><br><b>+${f.p}</b>
                 </div>
             `;
         });
+        document.getElementById('click-info').innerText = `Сила клика: ${pwr * g.mult}`;
+        document.getElementById('fighter-count').innerText = g.owned.length;
 
-        // Расчет силы клика
-        let totalPwr = 1;
-        g.fighters.forEach(fid => {
-            const f = ALL_FIGHTERS.find(x => x.id === fid);
-            if(f) totalPwr += f.power;
-        });
-        document.getElementById('click-pwr').innerText = `Сила клика: ${totalPwr * g.mult}`;
-        
-        localStorage.setItem('EnergyCat_Save2026', JSON.stringify(g));
+        // Кот эволюция
+        let c = document.getElementById('cat-main');
+        if(g.en >= 50000) c.innerText = '🦁'; else if(g.en >= 10000) c.innerText = '🐯';
+
+        // Квесты
+        document.getElementById('quest-container').innerHTML = `
+            <div class="quest-card">Кликнуть ${g.q.target} раз: ${g.q.click}/${g.q.target} <br> Награда: 250 XP</div>
+        `;
+
+        renderPass();
+        localStorage.setItem('CatV2026_Ultra', JSON.stringify(g));
     }
 
-    document.getElementById('cat-btn').onclick = () => {
-        let pwr = 1;
-        g.fighters.forEach(fid => { pwr += ALL_FIGHTERS.find(x => x.id === fid).power; });
-        g.energy += (pwr * g.mult);
-        g.xp += 1;
-        if(g.xp % 100 === 0) g.passLvl++;
-        updateUI();
+    document.getElementById('cat-main').onclick = () => {
+        let pwr = 0; g.owned.forEach(id => pwr += DB[id].p);
+        g.en += (pwr * g.mult);
+        g.xp += 2;
+        g.q.click++;
+        
+        if(g.q.click >= g.q.target) {
+            g.xp += 250; g.q.click = 0; g.q.target += 50; alert("Квест выполнен! +250 XP");
+        }
+
+        // Проверка уровня пасса (1 уровень = 500 XP)
+        if(g.lvl < 30 && g.xp >= g.lvl * 500) {
+            g.lvl++;
+            if(g.lvl === 30) alert("ENERGY PASS ЗАВЕРШЕН! Открыт бесконечный бонус.");
+        } else if(g.lvl >= 30) {
+            g.prestigeXP += 2;
+            if(g.prestigeXP >= 2800) {
+                g.prestigeXP = 0;
+                giveRandomPrestigeReward();
+            }
+        }
+        ui();
     };
 
-    // Система Боксов
-    function buyBox(type) {
-        if(type === 'energy' && g.energy >= 10000) {
-            g.energy -= 10000;
-            openBox(['COMMON', 'RARE', 'EPIC']);
-        } else if(type === 'gem' && g.gems >= 250) {
-            g.gems -= 250;
-            openBox(['RARE', 'EPIC', 'MYTHIC', 'LEGEND']);
-        }
-    }
-
-    function openBox(pool) {
-        const rand = Math.random();
-        let drop = ALL_FIGHTERS[0];
-        if(rand > 0.95 && pool.includes('LEGEND')) drop = ALL_FIGHTERS.find(f => f.rarity === 'LEGEND');
-        else if(rand > 0.8) drop = ALL_FIGHTERS.find(f => f.rarity === 'MYTHIC') || drop;
+    function renderPass() {
+        const row = document.getElementById('pass-row'); row.innerHTML = '';
+        document.getElementById('plus-btn-area').innerHTML = g.plus ? '' : `<button onclick="buyPlus()" style="width:100%; background:var(--plus); color:black; margin-bottom:10px;">КУПИТЬ PASS PLUS (1000 ⚡)</button>`;
         
-        if(!g.fighters.includes(drop.id)) {
-            g.fighters.push(drop.id);
-            alert(`ВЫПАЛ НОВЫЙ БОЕЦ: ${drop.name}!`);
-        } else {
-            const compensation = 50;
-            g.gems += compensation;
-            alert(`Повторка! Получено ${compensation} гемов.`);
+        for(let i=1; i<=30; i++) {
+            let cl = g.claimed.includes('n'+i);
+            let clP = g.claimed.includes('p'+i);
+            row.innerHTML += `
+                <div class="level-card ${g.plus?'plus-active':''}">
+                    <b>Ур. ${i}</b><hr>
+                    <small>Бесплатно:</small><br>10 💎
+                    <button class="claim-btn" ${g.lvl>=i && !cl?'':'disabled'} onclick="claim('n',${i},10)">${cl?'Взято':'Взять'}</button>
+                    <div style="margin-top:10px; border-top:1px solid #444; padding-top:5px;">
+                        <small style="color:var(--plus)">PLUS:</small><br>Бокс
+                        <button class="claim-btn" ${g.lvl>=i && g.plus && !clP?'':'disabled'} onclick="claim('p',${i},0)">${clP?'Взято':'Взять'}</button>
+                    </div>
+                </div>
+            `;
         }
-        updateUI();
-    }
-
-    // Админка
-    function handleAdmin() {
-        const p = document.getElementById('adm-p');
-        const c = document.getElementById('adm-c');
-        if(!g.isAdmin) {
-            if(p.value === "0605" || p.value === "132546578900") {
-                g.isAdmin = true; p.style.display='none'; c.style.display='block';
-            }
-        } else {
-            let val = c.value;
-            if(val.startsWith('UP_')) {
-                let data = JSON.parse(atob(val.replace('UP_','')));
-                if(data.type === 'give_all') g.fighters = ALL_FIGHTERS.map(f => f.id);
-                if(data.type === 'add_gems') g.gems += data.amt;
-                if(data.type === 'set_mult') g.mult = data.amt;
-                alert("Код применен!");
-            }
-            c.value = ''; updateUI();
+        if(g.lvl >= 30) {
+            document.getElementById('prestige-area').style.display = 'block';
+            document.getElementById('prestige-bar').value = g.prestigeXP;
         }
     }
 
-    // Текстовые сохранения
-    function saveToTxt() {
-        const blob = new Blob([JSON.stringify(g)], {type:'text/plain'});
+    function claim(type, lvl, val) {
+        if(type === 'n') { g.gem += val; g.claimed.push('n'+lvl); }
+        else { openBox('common'); g.claimed.push('p'+lvl); }
+        ui();
+    }
+
+    function buyPlus() {
+        if(g.en >= 1000) { g.en -= 1000; g.plus = true; ui(); alert("ENERGY PASS PLUS КУПЛЕН!"); }
+    }
+
+    function openBox(type) {
+        if(type==='common' && g.en < 1500 && arguments.length > 0) return;
+        if(type==='mega' && g.gem < 80) return;
+        
+        if(type==='common') g.en -= 1500; else g.gem -= 80;
+
+        const keys = Object.keys(DB);
+        const prize = keys[Math.floor(Math.random()*keys.length)];
+        if(!g.owned.includes(prize)) {
+            g.owned.push(prize);
+            alert("НОВЫЙ БОЕЦ: " + DB[prize].n + " (" + DB[prize].r + ")");
+        } else {
+            g.gem += 15; alert("Повторка! Дано 15 гемов.");
+        }
+        ui();
+    }
+
+    function giveRandomPrestigeReward() {
+        if(Math.random() > 0.5) {
+            document.getElementById('special-offer').innerHTML = `
+                <div class="quest-card" style="border-color:var(--legendary)">
+                    🔥 ШАНС: Мегабокс за 10 Гемов!<br>
+                    <button onclick="buyDiscountBox()" style="background:var(--legendary); color:black; width:100%">КУПИТЬ ЗА 10 💎</button>
+                </div>
+            `;
+            alert("СУПЕР-ПРЕДЛОЖЕНИЕ в магазине!");
+        } else {
+            alert("БЕСПЛАТНЫЙ БОКС!");
+            openBox('free');
+        }
+    }
+
+    function buyDiscountBox() {
+        if(g.gem >= 10) { g.gem -= 10; openBox('free'); document.getElementById('special-offer').innerHTML = ''; }
+    }
+
+    function useCode() {
+        let val = document.getElementById('code-in').value;
+        if(val.startsWith("UP_")) {
+            let d = JSON.parse(atob(val.replace("UP_","")));
+            if(d.type === 'give_plus') g.plus = true;
+            if(d.type === 'add_gems') g.gem += d.amt;
+            if(d.type === 'set_mult') g.mult = d.amt;
+            alert("Код активирован!"); ui();
+        }
+    }
+
+    function saveTxt() {
+        const blob = new Blob([JSON.stringify(g)], {type: 'text/plain'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'cat_mega_save.txt';
+        a.download = 'cat_final_2026.txt';
         a.click();
     }
 
-    function loadFromTxt(e) {
-        const r = new FileReader();
-        r.onload = (ev) => { g = JSON.parse(ev.target.result); updateUI(); };
-        r.readAsText(e.target.files[0]);
-    }
-
-    // Инициализация таймера
-    setInterval(() => {
-        let now = Date.now();
-        let diff = 300000 - (now - g.lastBoxTime); // 5 минут
-        if(diff <= 0) {
-            document.getElementById('free-box-timer').innerText = "Бесплатный бокс ГОТОВ!";
-        } else {
-            let m = Math.floor(diff/60000);
-            let s = Math.floor((diff%60000)/1000);
-            document.getElementById('free-box-timer').innerText = `Бесплатный бокс через: ${m}:${s < 10 ? '0'+s : s}`;
-        }
-    }, 1000);
-
-    if(localStorage.getItem('EnergyCat_Save2026')) g = JSON.parse(localStorage.getItem('EnergyCat_Save2026'));
-    updateUI();
+    ui();
 </script>
 </body>
 </html>
