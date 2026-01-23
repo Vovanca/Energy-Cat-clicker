@@ -3,193 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Energy Cat Tycoon 2026</title>
+    <title>Energy Cat Tycoon: EVOLUTION 2026</title>
     <style>
-        :root { --orange: #ff9f43; --blue: #54a0ff; --purple: #a55eea; --dark: #0d0d0f; --red: #ff4757; }
-        body { background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 10px; touch-action: manipulation; }
+        :root { 
+            --common: #bdc3c7; --rare: #3498db; --epic: #9b59b6; 
+            --mythic: #e67e22; --legendary: #f1c40f; --excl: #e74c3c;
+            --bg: #0d0d12; --panel: #1c1c24; 
+        }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 70px; user-select: none; }
         
-        #lang-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--dark); z-index:1000; display:flex; flex-direction:column; justify-content:center; align-items:center; }
-        .btn-l { width:200px; padding:15px; margin:10px; border-radius:12px; background:var(--blue); color:white; border:none; font-size:18px; font-weight:bold; }
+        /* Навигация */
+        .tabs { position: fixed; bottom: 0; width: 100%; background: var(--panel); display: flex; justify-content: space-around; padding: 10px 0; border-top: 2px solid #333; z-index: 1000; }
+        .tab-btn { background: none; border: none; color: #888; font-size: 12px; cursor: pointer; }
+        .tab-btn.active { color: var(--rare); font-weight: bold; }
 
-        .stats-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px; border: 1px solid #222; margin-bottom: 10px; }
-        #energy { font-size: 42px; color: var(--orange); font-weight: bold; }
-        
-        #cat { font-size: 100px; cursor: pointer; transition: 0.1s; display: inline-block; margin: 15px 0; user-select: none; }
-        #cat:active { transform: scale(0.85); }
-        
-        .shop { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 400px; margin: auto; }
-        .item { background: #1e1e24; padding: 10px; border-radius: 12px; border: 1px solid #333; font-size: 13px; }
-        .buy-b { background: var(--blue); color: white; width: 100%; padding: 8px; border-radius: 6px; border: none; font-weight: bold; margin-top: 5px; }
-        
-        #boss-ui { display: none; padding: 15px; border-radius: 15px; margin: 10px auto; max-width: 350px; }
-        .hp-bar { width: 100%; height: 10px; background: #333; border-radius: 5px; margin-top: 5px; overflow: hidden; }
-        #hp-f { height: 100%; width: 100%; background: var(--red); transition: 0.2s; }
-        .shadow-b { background: #000; border: 2px solid #555; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
-        .norm-b { background: #4b1a1a; border: 1px solid var(--red); }
+        /* Экраны */
+        .screen { display: none; padding: 20px; animation: fadeIn 0.3s; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .promo-card { background: linear-gradient(45deg, #2c3e50, #000); border: 1px solid var(--purple) !important; grid-column: span 2; }
-        .admin-sec { margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; }
-        input { width: 80%; padding: 10px; background: #111; border: 1px solid #333; color: #0f0; border-radius: 8px; margin-bottom: 5px; }
+        /* Статистика */
+        .top-bar { background: var(--panel); padding: 15px; display: flex; justify-content: space-around; position: sticky; top: 0; z-index: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .stat-val { font-weight: bold; color: #ff9f43; }
+
+        /* Бойцы и Магазин */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .card { background: var(--panel); border-radius: 15px; padding: 15px; text-align: center; border: 1px solid #333; position: relative; }
+        .rarity-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; position: absolute; top: 5px; right: 5px; text-transform: uppercase; }
+        
+        /* Кнопка Кота */
+        .main-cat { font-size: 120px; margin: 40px auto; display: block; cursor: pointer; transition: 0.1s; width: fit-content; }
+        .main-cat:active { transform: scale(0.8); }
+
+        /* Пасс и Квесты */
+        .pass-bar { background: #333; height: 20px; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+        .pass-fill { height: 100%; background: linear-gradient(90deg, #f1c40f, #e67e22); width: 0%; transition: 0.5s; }
+        
+        .box-timer { font-size: 14px; color: #2ecc71; margin-top: 10px; }
+        .locked { filter: grayscale(1); opacity: 0.5; }
+        
+        input[type="password"], input[type="text"] { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #0f0; border-radius: 8px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div id="lang-screen">
-    <h2>Energy Cat 2026</h2>
-    <button class="btn-l" onclick="setL('ru')">Русский 🇷🇺</button>
-    <button class="btn-l" onclick="setL('en')">English 🇺🇸</button>
-</div>
-
-<div class="stats-box">
-    <div id="energy">0</div>
-    <div id="cat-rank" style="color: #888;">Котёнок</div>
-    <div>Гемы: <span id="gems" style="color:var(--purple)">0</span> 💎</div>
-    <div style="font-size:12px; opacity:0.6;">Mult: x<span id="mult">1</span></div>
-</div>
-
-<div id="boss-ui">
-    <div id="b-icon" style="font-size:40px;">🐶</div>
-    <b id="b-name">BOSS</b>
-    <div class="hp-bar"><div id="hp-f"></div></div>
-</div>
-
-<div id="cat">🐱</div>
-
-<div class="shop">
-    <div class="item">Power<button class="buy-b" onclick="buy('p')">Cost: <span id="pc">15</span></button></div>
-    <div class="item">Auto<button class="buy-b" onclick="buy('a')">Cost: <span id="ac">50</span></button></div>
-    
-    <div id="promo-box" class="item promo-card" style="display:none">
-        <span id="promo-n">Action</span>
-        <button class="buy-b" onclick="buyPromo()" id="promo-btn" style="background:var(--purple)">Buy</button>
+    <div class="top-bar">
+        <div>⚡ <span id="en-val" class="stat-val">0</span></div>
+        <div>💎 <span id="gem-val" style="color: #a55eea;">0</span></div>
+        <div>⭐ <span id="xp-val" style="color: #f1c40f;">0</span></div>
     </div>
-</div>
 
-<div class="admin-sec">
-    <input type="password" id="adm-pass" placeholder="Password (0605)">
-    <input type="text" id="adm-code" placeholder="Code (100en... / UP_...)" style="display:none">
-    <button onclick="handleAdmin()" style="background:#333; color:white; padding:10px; border-radius:8px; border:none; width:84%;">OK</button>
-    
-    <div style="margin-top:10px;">
-        <button onclick="saveGame()" style="width:40%; font-size:10px;">Save .TXT</button>
-        <button onclick="document.getElementById('f-in').click()" style="width:40%; font-size:10px;">Load .TXT</button>
-        <input type="file" id="f-in" style="display:none" onchange="loadGame(event)">
+    <!-- ЭКРАН 1: КЛИКЕР -->
+    <div id="scr-click" class="screen active">
+        <div id="boss-zone" style="display:none; background: #4b1a1a; padding: 10px; border-radius: 10px; margin-bottom: 20px;">
+            <b id="boss-name">BOSS</b>
+            <div style="background:#222; height:10px; border-radius:5px;"><div id="boss-hp" style="height:100%; background:red; width:100%;"></div></div>
+        </div>
+        <div class="main-cat" id="cat-btn">🐱</div>
+        <h3 id="cat-rank">Обычный Котёнок</h3>
+        <p id="click-pwr">Сила клика: 1</p>
     </div>
-</div>
+
+    <!-- ЭКРАН 2: БОЙЦЫ -->
+    <div id="scr-fighters" class="screen">
+        <h2>Мои Бойцы</h2>
+        <div class="grid" id="fighters-list">
+            <!-- Бойцы добавляются здесь -->
+        </div>
+    </div>
+
+    <!-- ЭКРАН 3: МАГАЗИН И БОКСЫ -->
+    <div id="scr-shop" class="screen">
+        <h2>Магазин Боксов</h2>
+        <div class="grid">
+            <div class="card">
+                <b>Обычный Бокс</b><br><small>10,000 Энергии</small>
+                <button onclick="buyBox('energy')" style="width:100%; background:var(--rare); border:none; padding:8px; margin-top:5px; border-radius:5px;">Открыть</button>
+            </div>
+            <div class="card">
+                <div class="rarity-tag" style="background:var(--legendary); color:black;">BEST</div>
+                <b>Мега Бокс</b><br><small>250 Гемов</small>
+                <button onclick="buyBox('gem')" style="width:100%; background:var(--legendary); border:none; padding:8px; margin-top:5px; border-radius:5px;">Открыть</button>
+            </div>
+        </div>
+        <p class="box-timer" id="free-box-timer">Бесплатный бокс через: --:--</p>
+        <hr>
+        <div id="promo-area"></div>
+    </div>
+
+    <!-- ЭКРАН 4: ПАСС И КВЕСТЫ -->
+    <div id="scr-pass" class="screen">
+        <h2>Energy Pass</h2>
+        <div class="pass-bar"><div class="pass-fill" id="pass-progress"></div></div>
+        <p>Уровень: <span id="pass-lvl">1</span></p>
+        <div id="quest-list">
+            <!-- Квесты -->
+        </div>
+    </div>
+
+    <!-- ЭКРАН 5: АДМИНКА -->
+    <div id="scr-admin" class="screen">
+        <input type="password" id="adm-p" placeholder="Пароль доступа">
+        <input type="text" id="adm-c" style="display:none" placeholder="Введите код UP_...">
+        <button onclick="handleAdmin()" style="width:100%; padding:15px; margin-top:10px; background:#333; color:white; border:none; border-radius:10px;">ВВОД</button>
+        <br><br>
+        <button onclick="saveToTxt()" style="font-size:10px;">Сохранить в .txt</button>
+        <button onclick="document.getElementById('load-f').click()" style="font-size:10px;">Загрузить .txt</button>
+        <input type="file" id="load-f" style="display:none" onchange="loadFromTxt(event)">
+    </div>
+
+    <div class="tabs">
+        <div class="tab-btn active" onclick="showScreen('scr-click', this)">КЛИК</div>
+        <div class="tab-btn" onclick="showScreen('scr-fighters', this)">БОЙЦЫ</div>
+        <div class="tab-btn" onclick="showScreen('scr-shop', this)">МАГАЗИН</div>
+        <div class="tab-btn" onclick="showScreen('scr-pass', this)">ПАСС</div>
+        <div class="tab-btn" onclick="showScreen('scr-admin', this)">АДМИН</div>
+    </div>
 
 <script>
-    let g = { m: 0, p: 1, a: 0, pc: 15, ac: 50, gems: 0, mult: 1, lang: null, gift: false };
-    let boss = { active: false, hp: 0, mHp: 0, type: 'normal' };
-    let activePromo = null;
-    let auth = false;
-
-    const lang = {
-        ru: { r0: "Котёнок", r1: "Сильный Кот 💪", r2: "СУПЕР-КОТ ⚡", win: "Победа!", bossS: "ТЕНЕВОЙ ВРАГ", bossN: "ЗЛОЙ ПЁС" },
-        en: { r0: "Kitten", r1: "Strong Cat 💪", r2: "SUPER CAT ⚡", win: "Victory!", bossS: "SHADOW ENEMY", bossN: "EVIL DOG" }
+    // --- ДАННЫЕ ИГРЫ ---
+    const RARITY = {
+        COMMON: { n: "Обычный", c: "#bdc3c7", price: 100 },
+        RARE: { n: "Редкий", c: "#3498db", price: 200 },
+        EPIC: { n: "Эпический", c: "#9b59b6", price: 300 },
+        MYTHIC: { n: "Мифический", c: "#e67e22", price: 400 },
+        LEGEND: { n: "Легенда", c: "#f1c40f", price: 500 },
+        EXCL: { n: "ЭКСКЛЮЗИВ", c: "#e74c3c", price: 9999 }
     };
 
-    if(localStorage.getItem('CatEnergy2026_Final')) {
-        g = JSON.parse(localStorage.getItem('CatEnergy2026_Final'));
-        if(g.lang) document.getElementById('lang-screen').style.display='none';
+    const ALL_FIGHTERS = [
+        { id: 'f1', name: 'Энергия Кот', rarity: 'COMMON', power: 2, icon: '🐱' },
+        { id: 'f2', name: 'H2 Кот', rarity: 'RARE', power: 5, icon: '💧' },
+        { id: 'f3', name: 'Плащ-Кот', rarity: 'EPIC', power: 12, icon: '🧥' },
+        { id: 'f4', name: 'Сильный Энерго-Кот', rarity: 'MYTHIC', power: 30, icon: '💪' },
+        { id: 'f5', name: 'Кот-Зевс', rarity: 'LEGEND', power: 100, icon: '⚡' },
+        { id: 'f6', name: 'Эксклюзивный Эпик', rarity: 'EXCL', power: 250, icon: '👑' }
+    ];
+
+    let g = {
+        energy: 0, gems: 0, xp: 0, 
+        fighters: ['f1'], 
+        passLvl: 1, 
+        lastBoxTime: Date.now(),
+        mult: 1, 
+        isAdmin: false
+    };
+
+    // --- ЛОГИКА ---
+    function showScreen(id, btn) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
     }
 
-    function setL(l) { g.lang = l; document.getElementById('lang-screen').style.display='none'; ui(); }
+    function updateUI() {
+        document.getElementById('en-val').innerText = Math.floor(g.energy).toLocaleString();
+        document.getElementById('gem-val').innerText = g.gems;
+        document.getElementById('xp-val').innerText = g.xp;
+        document.getElementById('pass-lvl').innerText = g.passLvl;
+        document.getElementById('pass-progress').style.width = (g.xp % 100) + '%';
+        
+        // Рендер бойцов
+        const fList = document.getElementById('fighters-list');
+        fList.innerHTML = '';
+        ALL_FIGHTERS.forEach(f => {
+            const owned = g.fighters.includes(f.id);
+            fList.innerHTML += `
+                <div class="card ${owned ? '' : 'locked'}">
+                    <div class="rarity-tag" style="background:${RARITY[f.rarity].c}">${RARITY[f.rarity].n}</div>
+                    <div style="font-size:40px">${f.icon}</div>
+                    <b>${f.name}</b><br>
+                    <small>Урон: ${f.power}</small>
+                </div>
+            `;
+        });
 
-    function ui() {
-        if(!g.lang) return;
-        document.getElementById('energy').innerText = Math.floor(g.m).toLocaleString();
-        document.getElementById('gems').innerText = g.gems;
-        document.getElementById('pc').innerText = g.pc;
-        document.getElementById('ac').innerText = g.ac;
-        document.getElementById('mult').innerText = g.mult;
-
-        let r = document.getElementById('cat-rank');
-        let c = document.getElementById('cat');
-        if(g.m < 2000) { r.innerText = lang[g.lang].r0; }
-        else if(g.m < 10000) { r.innerText = lang[g.lang].r1; c.innerText = '🐯'; }
-        else { r.innerText = lang[g.lang].r2; c.innerText = '🦁'; }
-
-        localStorage.setItem('CatEnergy2026_Final', JSON.stringify(g));
+        // Расчет силы клика
+        let totalPwr = 1;
+        g.fighters.forEach(fid => {
+            const f = ALL_FIGHTERS.find(x => x.id === fid);
+            if(f) totalPwr += f.power;
+        });
+        document.getElementById('click-pwr').innerText = `Сила клика: ${totalPwr * g.mult}`;
+        
+        localStorage.setItem('EnergyCat_Save2026', JSON.stringify(g));
     }
 
-    document.getElementById('cat').onclick = () => {
-        if(boss.active) {
-            boss.hp -= g.p;
-            document.getElementById('hp-f').style.width = (boss.hp/boss.mHp)*100 + '%';
-            if(boss.hp <= 0) {
-                boss.active = false; document.getElementById('boss-ui').style.display='none';
-                let rew = boss.type==='shadow' ? 25 : 5; g.gems += rew; alert(lang[g.lang].win + " +" + rew + " 💎");
-            }
-        } else {
-            g.m += (g.p * g.mult);
-            if(Math.random() < 0.03) spawnBoss('shadow'); else if(Math.random() < 0.1) spawnBoss('normal');
+    document.getElementById('cat-btn').onclick = () => {
+        let pwr = 1;
+        g.fighters.forEach(fid => { pwr += ALL_FIGHTERS.find(x => x.id === fid).power; });
+        g.energy += (pwr * g.mult);
+        g.xp += 1;
+        if(g.xp % 100 === 0) g.passLvl++;
+        updateUI();
+    };
+
+    // Система Боксов
+    function buyBox(type) {
+        if(type === 'energy' && g.energy >= 10000) {
+            g.energy -= 10000;
+            openBox(['COMMON', 'RARE', 'EPIC']);
+        } else if(type === 'gem' && g.gems >= 250) {
+            g.gems -= 250;
+            openBox(['RARE', 'EPIC', 'MYTHIC', 'LEGEND']);
         }
-        ui();
-    };
-
-    function spawnBoss(t) {
-        boss.active = true; boss.type = t;
-        const bUI = document.getElementById('boss-ui');
-        bUI.style.display = 'block';
-        if(t === 'shadow') { boss.mHp = g.p * 50; bUI.className = 'shadow-b'; document.getElementById('b-icon').innerText="🌑"; document.getElementById('b-name').innerText=lang[g.lang].bossS; }
-        else { boss.mHp = g.p * 15; bUI.className = 'norm-b'; document.getElementById('b-icon').innerText="🐶"; document.getElementById('b-name').innerText=lang[g.lang].bossN; }
-        boss.hp = boss.mHp;
     }
 
-    setInterval(() => { if(g.a > 0 && !boss.active) { g.m += (g.a * g.mult); ui(); } }, 1000);
-
-    function buy(t) {
-        if(t==='p' && g.m>=g.pc) { g.m-=g.pc; g.p++; g.pc=Math.round(g.pc*1.6); }
-        if(t==='a' && g.m>=g.ac) { g.m-=g.ac; g.a++; g.ac=Math.round(g.ac*1.7); }
-        ui();
+    function openBox(pool) {
+        const rand = Math.random();
+        let drop = ALL_FIGHTERS[0];
+        if(rand > 0.95 && pool.includes('LEGEND')) drop = ALL_FIGHTERS.find(f => f.rarity === 'LEGEND');
+        else if(rand > 0.8) drop = ALL_FIGHTERS.find(f => f.rarity === 'MYTHIC') || drop;
+        
+        if(!g.fighters.includes(drop.id)) {
+            g.fighters.push(drop.id);
+            alert(`ВЫПАЛ НОВЫЙ БОЕЦ: ${drop.name}!`);
+        } else {
+            const compensation = 50;
+            g.gems += compensation;
+            alert(`Повторка! Получено ${compensation} гемов.`);
+        }
+        updateUI();
     }
 
+    // Админка
     function handleAdmin() {
-        let p = document.getElementById('adm-pass');
-        let c = document.getElementById('adm-code');
-        if(!auth) {
+        const p = document.getElementById('adm-p');
+        const c = document.getElementById('adm-c');
+        if(!g.isAdmin) {
             if(p.value === "0605" || p.value === "132546578900") {
-                auth = true; p.style.display='none'; c.style.display='inline-block';
+                g.isAdmin = true; p.style.display='none'; c.style.display='block';
             }
         } else {
-            let v = c.value;
-            if(v.startsWith('100en')) { g.m += parseInt(v.replace('100en','')) || 0; }
-            else if(v.startsWith('UP_')) {
-                let d = JSON.parse(atob(v.replace('UP_','')));
-                if(d.type==='mult') g.mult = d.val;
-                if(d.type==='promo') {
-                    activePromo = d;
-                    document.getElementById('promo-box').style.display='block';
-                    document.getElementById('promo-n').innerText = d.name;
-                    document.getElementById('promo-btn').innerText = d.cost + " 💎";
-                }
+            let val = c.value;
+            if(val.startsWith('UP_')) {
+                let data = JSON.parse(atob(val.replace('UP_','')));
+                if(data.type === 'give_all') g.fighters = ALL_FIGHTERS.map(f => f.id);
+                if(data.type === 'add_gems') g.gems += data.amt;
+                if(data.type === 'set_mult') g.mult = data.amt;
+                alert("Код применен!");
             }
-            c.value = ""; ui();
+            c.value = ''; updateUI();
         }
     }
 
-    function buyPromo() {
-        if(activePromo && g.gems >= activePromo.cost) {
-            g.gems -= activePromo.cost; g.m += activePromo.reward;
-            document.getElementById('promo-box').style.display='none';
-            activePromo = null; ui();
-        }
-    }
-
-    function saveGame() {
-        const blob = new Blob([JSON.stringify(g)], {type: 'text/plain'});
+    // Текстовые сохранения
+    function saveToTxt() {
+        const blob = new Blob([JSON.stringify(g)], {type:'text/plain'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'cat_save_2026.txt';
+        a.download = 'cat_mega_save.txt';
         a.click();
     }
 
-    function loadGame(e) {
+    function loadFromTxt(e) {
         const r = new FileReader();
-        r.onload = (ev) => { g = JSON.parse(ev.target.result); ui(); alert("OK!"); };
+        r.onload = (ev) => { g = JSON.parse(ev.target.result); updateUI(); };
         r.readAsText(e.target.files[0]);
     }
-    ui();
+
+    // Инициализация таймера
+    setInterval(() => {
+        let now = Date.now();
+        let diff = 300000 - (now - g.lastBoxTime); // 5 минут
+        if(diff <= 0) {
+            document.getElementById('free-box-timer').innerText = "Бесплатный бокс ГОТОВ!";
+        } else {
+            let m = Math.floor(diff/60000);
+            let s = Math.floor((diff%60000)/1000);
+            document.getElementById('free-box-timer').innerText = `Бесплатный бокс через: ${m}:${s < 10 ? '0'+s : s}`;
+        }
+    }, 1000);
+
+    if(localStorage.getItem('EnergyCat_Save2026')) g = JSON.parse(localStorage.getItem('EnergyCat_Save2026'));
+    updateUI();
 </script>
 </body>
 </html>
