@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Кото-Титан 2026</title>
+    <style>
+        :root { --orange: #ff9f43; --blue: #54a0ff; --dark: #121216; }
+        body { 
+            background: var(--dark); color: white; font-family: sans-serif; 
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
+            touch-action: manipulation; /* Убирает задержку клика на Android */
+        }
+        
+        .stats-card {
+            background: rgba(255,255,255,0.07); padding: 15px; border-radius: 20px;
+            width: 90%; text-align: center; margin-bottom: 15px; border: 1px solid #333;
+        }
+        #money { font-size: 45px; font-weight: bold; color: var(--orange); }
+        
+        #cat-btn { 
+            font-size: 120px; margin: 20px 0; transition: transform 0.05s; 
+            cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        #cat-btn:active { transform: scale(0.9); }
+
+        .shop-grid { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 400px; 
+        }
+        .item { 
+            background: #1e1e24; padding: 12px; border-radius: 15px; text-align: center; 
+            border: 1px solid #444; font-size: 14px;
+        }
+        button { 
+            width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; border: none;
+            font-weight: bold; background: var(--blue); color: white; font-size: 16px;
+        }
+        button:active { filter: brightness(1.2); }
+
+        .admin-zone { margin-top: 25px; width: 100%; max-width: 400px; border-top: 1px solid #333; padding-top: 15px; }
+        input { 
+            width: 100%; padding: 12px; box-sizing: border-box; border-radius: 10px; 
+            border: 1px solid #444; background: #000; color: #0f0; margin-bottom: 10px; font-size: 16px;
+        }
+        .save-row { display: flex; gap: 5px; margin-top: 10px; }
+        .btn-s { font-size: 12px; background: #444; padding: 10px 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="stats-card">
+        <div id="money">0</div>
+        <div id="status" style="color: #888;">Обычный Котёнок</div>
+        <div style="font-size: 14px; margin-top: 5px;">Сила клика: <span id="pwr">1</span> | Авто: <span id="auto">0</span>/с</div>
+    </div>
+
+    <div id="cat-btn">🐱</div>
+
+    <div class="shop-grid">
+        <div class="item">🥤 Энергетик<button onclick="buy('p')">Цена: <span id="p-c">15</span></button></div>
+        <div class="item">🤖 Трудяга<button onclick="buy('a')">Цена: <span id="a-c">50</span></button></div>
+    </div>
+
+    <div class="admin-zone">
+        <input type="password" id="passInp" placeholder="Пароль доступа">
+        <input type="text" id="codeInp" placeholder="Код (например, 100en500 или 1000sert)" style="display:none">
+        <button onclick="checkAdmin()" id="admBtn" style="background: #555;">ОК</button>
+        
+        <div class="save-row">
+            <button class="btn-s" onclick="exportData()">💾 Сохранить .txt</button>
+            <button class="btn-s" onclick="document.getElementById('fileInp').click()">📂 Загрузить .txt</button>
+            <button class="btn-s" onclick="document.getElementById('certInp').click()">🎫 Сертификат</button>
+        </div>
+    </div>
+
+    <!-- Скрытые элементы -->
+    <input type="file" id="fileInp" style="display:none" onchange="importData(event, 'save')">
+    <input type="file" id="certInp" style="display:none" onchange="importData(event, 'cert')">
+
+<script>
+    let g = { m: 0, p: 1, a: 0, pc: 15, ac: 50 }; // Объект игры
+    let isAdmin = false;
+
+    // Загрузка из памяти телефона при старте
+    if(localStorage.getItem('catSave2026')) {
+        g = JSON.parse(localStorage.getItem('catSave2026'));
+    }
+
+    const cat = document.getElementById('cat-btn');
+    
+    function ui() {
+        document.getElementById('money').innerText = Math.floor(g.m);
+        document.getElementById('pwr').innerText = g.p;
+        document.getElementById('auto').innerText = g.a;
+        document.getElementById('p-c').innerText = g.pc;
+        document.getElementById('a-c').innerText = g.ac;
+        
+        const st = document.getElementById('status');
+        if(g.m >= 10000) { cat.innerText = '🦁'; st.innerText = 'СУПЕР-КОТ СИЛЬНЫЙ'; st.style.color = 'var(--orange)'; }
+        else if(g.m >= 2000) { cat.innerText = '🐯'; st.innerText = 'Сильный Кот'; st.style.color = 'var(--blue)'; }
+        
+        localStorage.setItem('catSave2026', JSON.stringify(g)); // Автосохранение
+    }
+
+    cat.onclick = () => { g.m += g.p; ui(); };
+    setInterval(() => { if(g.a > 0) { g.m += g.a; ui(); } }, 1000);
+
+    function buy(type) {
+        if(type === 'p' && g.m >= g.pc) { g.m -= g.pc; g.p += 1; g.pc = Math.round(g.pc * 1.6); }
+        if(type === 'a' && g.m >= g.ac) { g.m -= g.ac; g.a += 1; g.ac = Math.round(g.ac * 1.7); }
+        ui();
+    }
+
+    function checkAdmin() {
+        const pInp = document.getElementById('passInp');
+        const cInp = document.getElementById('codeInp');
+        
+        if(!isAdmin) {
+            if(pInp.value === "0605") {
+                isAdmin = true; pInp.style.display = 'none'; cInp.style.display = 'block';
+            } else { alert("Х"); }
+        } else {
+            let val = cInp.value;
+            if(val.startsWith('100en')) { g.m += parseInt(val.slice(5)) || 0; }
+            if(val.endsWith('sert')) { createSert(parseInt(val) || 0); }
+            cInp.value = ""; ui();
+        }
+    }
+
+    function createSert(num) {
+        const blob = new Blob([btoa("C-"+num)], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `cert_${num}.txt`;
+        a.click();
+    }
+
+    function exportData() {
+        const blob = new Blob([JSON.stringify(g)], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'cat_save.txt';
+        a.click();
+    }
+
+    function importData(e, type) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            if(type === 'save') { g = JSON.parse(ev.target.result); alert("Загружено!"); }
+            else {
+                let d = atob(ev.target.result);
+                if(d.startsWith("C-")) { g.m += parseInt(d.slice(2)); alert("Бонус!"); }
+            }
+            ui();
+        };
+        reader.readAsText(e.target.files[0]);
+    }
+
+    ui();
+</script>
+</body>
+</html>
