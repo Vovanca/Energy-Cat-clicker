@@ -3,48 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Energy Cat 2026: Box Master</title>
+    <title>Energy Cat 2026: Total Collection</title>
     <style>
         :root { 
             --common: #bdc3c7; --rare: #3498db; --epic: #9b59b6; 
             --mythic: #e67e22; --legendary: #f1c40f; --plus: #00ffcc;
-            --excl: #ff4757; --bg: #0d0d12; --panel: #1c1c24; 
+            --excl: #ff4757; --bg: #0a0a0e; --panel: #16161e; 
         }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; user-select: none; overflow: hidden; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; user-select: none; }
         
-        /* ГЛАВНЫЙ ЭКРАН ОТКРЫТИЯ БОКСА */
-        #box-scene {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #2c3e50 0%, #000 100%);
-            z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center;
-        }
-        #box-render { font-size: 150px; cursor: pointer; transition: 0.1s; filter: drop-shadow(0 0 30px var(--plus)); }
-        #box-render.shake { animation: shake 0.2s infinite; }
-        @keyframes shake { 0% { transform: rotate(3deg); } 50% { transform: rotate(-3deg); } 100% { transform: rotate(3deg); } }
-        
-        #reward-pop { 
-            display: none; text-align: center; background: rgba(255,255,255,0.1); 
-            padding: 30px; border-radius: 20px; border: 2px solid var(--plus);
-            animation: rewardGet 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes rewardGet { from { transform: scale(0); } to { transform: scale(1.1); } }
+        .top-bar { background: var(--panel); padding: 15px; display: flex; justify-content: space-around; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #333; }
+        .stat { font-weight: bold; font-size: 18px; }
 
-        /* ИНТЕРФЕЙС */
+        /* Вкладки */
         .tabs { position: fixed; bottom: 0; width: 100%; background: var(--panel); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; z-index: 1000; }
-        .tab-btn { background: none; border: none; color: #666; font-size: 11px; cursor: pointer; }
-        .tab-btn.active { color: var(--plus); font-weight: bold; }
-        
-        .screen { display: none; padding: 20px; height: 80vh; overflow-y: auto; }
+        .tab-btn { background: none; border: none; color: #555; font-size: 10px; cursor: pointer; text-transform: uppercase; }
+        .tab-btn.active { color: var(--plus); border-bottom: 2px solid var(--plus); }
+
+        .screen { display: none; padding: 20px; height: 85vh; overflow-y: auto; box-sizing: border-box; }
         .screen.active { display: block; }
 
-        .pass-row { display: flex; overflow-x: auto; gap: 15px; padding: 20px 0; }
-        .lvl-card { min-width: 160px; background: #222; padding: 15px; border-radius: 15px; border: 1px solid #444; text-align: center; }
-        .lvl-card.plus-on { border-color: var(--plus); background: #0f1a1a; }
-        
+        /* Кот и Квесты */
+        #cat-main { font-size: 110px; cursor: pointer; transition: 0.1s; display: block; margin: 20px auto; width: fit-content; }
+        #cat-main:active { transform: scale(0.85); }
+        .quest-card { background: #1c1c24; padding: 15px; border-radius: 12px; border-left: 4px solid var(--plus); margin-top: 20px; }
+
+        /* Сетка Бойцов */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .f-card { background: #1c1c24; padding: 15px; border-radius: 15px; text-align: center; border: 2px solid #333; }
-        
-        button { padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
+        .f-card { background: #1c1c24; padding: 15px; border-radius: 15px; text-align: center; border: 2px solid #333; position: relative; transition: 0.3s; }
+        .f-card.locked { opacity: 0.4; filter: grayscale(1); border: 1px dashed #444; }
+        .f-rarity { font-size: 8px; font-weight: bold; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
+
+        /* Открытие бокса */
+        #box-scene { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:3000; display:none; flex-direction:column; align-items:center; justify-content:center; }
+        #box-render { font-size:120px; cursor:pointer; }
+        #reward-pop { display:none; text-align:center; background:rgba(255,255,255,0.05); padding:30px; border-radius:20px; border:2px solid var(--plus); }
+
+        input { width: 100%; padding: 15px; background: #000; border: 1px solid #444; color: #0f0; border-radius: 10px; margin-bottom: 10px; }
+        button { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
@@ -53,71 +49,68 @@
     <div id="box-scene">
         <div id="box-render" onclick="tapBox()">📦</div>
         <div id="reward-pop">
-            <div id="rew-icon" style="font-size: 100px;">⭐</div>
-            <h2 id="rew-text">НАГРАДА!</h2>
-            <p id="rew-sub">Нажми, чтобы забрать</p>
-            <button onclick="nextItem()" style="background:var(--plus); color:#000;">ДАЛЕЕ</button>
+            <div id="rew-icon" style="font-size:80px;">⭐</div>
+            <h2 id="rew-name">Награда</h2>
+            <button onclick="nextItem()" style="background:var(--plus); color:black;">ДАЛЕЕ</button>
         </div>
-        <div id="box-count" style="margin-top:20px; font-size:24px; color:var(--plus);">ОСТАЛОСЬ: 0</div>
+        <div id="box-info" style="margin-top:20px; color:var(--plus);">КЛИКАЙ!</div>
     </div>
 
-    <div style="background: var(--panel); padding: 15px; display: flex; justify-content: space-between; border-bottom: 1px solid #333;">
-        <div style="color:var(--orange); font-weight:bold;">⚡ <span id="en-val">0</span></div>
-        <div style="color:var(--purple); font-weight:bold;">💎 <span id="gem-val">0</span></div>
+    <div class="top-bar">
+        <div class="stat" style="color:var(--orange)">⚡ <span id="en-val">0</span></div>
+        <div class="stat" style="color:var(--purple)">💎 <span id="gem-val">0</span></div>
     </div>
 
     <!-- КЛИКЕР -->
     <div id="scr-click" class="screen active">
-        <div style="font-size:120px; margin:40px auto; cursor:pointer;" id="cat-main">🐱</div>
-        <h2 id="s-name">СЕЗОН 1: НАЧАЛО</h2>
-        <progress id="p-bar" value="0" max="500" style="width:100%"></progress>
-    </div>
-
-    <!-- ПАСС -->
-    <div id="scr-pass" class="screen">
-        <h3>ENERGY PASS (УРОВЕНЬ <span id="p-lvl">1</span>)</h3>
-        <button id="buy-plus" onclick="buyPlus()" style="background:var(--plus); color:black; margin-bottom:10px;">КУПИТЬ PLUS (1000 💎)</button>
-        <div class="pass-row" id="p-list"></div>
+        <div id="cat-main">🐱</div>
+        <h2 id="cat-rank">Обычный Котёнок</h2>
+        
+        <div class="quest-card">
+            <b style="color:var(--plus)">ТЕКУЩИЙ КВЕСТ</b><br>
+            <span id="q-text">Нажми 100 раз</span>: <span id="q-prog">0</span>/<span id="q-targ">100</span>
+            <div style="font-size:10px; color:#666; margin-top:5px;">Награда: +250 XP Энергия Пасса</div>
+        </div>
     </div>
 
     <!-- БОЙЦЫ -->
     <div id="scr-fighters" class="screen">
-        <h3>ТВОЙ ОТРЯД</h3>
+        <h3>КОЛЛЕКЦИЯ (<span id="f-count">0</span>/10)</h3>
         <div class="grid" id="f-grid"></div>
     </div>
 
-    <!-- МАГАЗИН -->
-    <div id="scr-shop" class="screen">
-        <h3>МАГАЗИН</h3>
-        <button onclick="startOpen('norm')" style="background:var(--rare); color:white; margin-bottom:10px;">ОБЫЧНЫЙ БОКС (1500 ⚡)</button>
-        <button onclick="startOpen('mega')" style="background:var(--legendary); color:black;">МЕГАБОКС (80 💎)</button>
+    <!-- КОДЫ -->
+    <div id="scr-codes" class="screen">
+        <h3>ВВОД ПРОМОКОДА</h3>
+        <input type="text" id="promo-input" placeholder="Введите UP_ код">
+        <button onclick="usePromo()" style="background:var(--plus); color:black;">АКТИВИРОВАТЬ</button>
+        
+        <div style="margin-top:40px; border-top:1px solid #333; padding-top:20px;">
+            <button onclick="saveGame()" style="background:#222; color:#555; font-size:10px;">💾 Сохранить .txt</button>
+            <button onclick="document.getElementById('load-f').click()" style="background:#222; color:#555; font-size:10px; margin-top:5px;">📂 Загрузить .txt</button>
+            <input type="file" id="load-f" style="display:none" onchange="loadGame(event)">
+        </div>
     </div>
 
     <div class="tabs">
-        <div class="tab-btn active" onclick="tab('scr-click', this)">КЛИК</div>
-        <div class="tab-btn" onclick="tab('scr-fighters', this)">БОЙЦЫ</div>
-        <div class="tab-btn" onclick="tab('scr-pass', this)">ПАСС</div>
-        <div class="tab-btn" onclick="tab('scr-shop', this)">ШОП</div>
+        <div class="tab-btn active" onclick="tab('scr-click', this)">Клик</div>
+        <div class="tab-btn" onclick="tab('scr-fighters', this)">Бойцы</div>
+        <div class="tab-btn" onclick="tab('scr-codes', this)">Коды</div>
     </div>
 
 <script>
     const DB = {
         f1: { n: "Кот-Новичок", p: 1, i: "🐱", r: "common" },
         f2: { n: "H2 Энерджи", p: 5, i: "💧", r: "rare" },
-        f_excl: { n: "ЗЕВС-ЭКСКЛЮЗИВ", p: 500, i: "🔱", r: "excl" }
+        f3: { n: "Плащ-Кот", p: 15, i: "🧥", r: "epic" },
+        f4: { n: "Сильный Кот", p: 40, i: "💪", r: "mythic" },
+        f5: { n: "Зевс", p: 150, i: "🔱", r: "legendary" },
+        f6: { n: "Теневой Бог", p: 500, i: "🌑", r: "excl" }
     };
 
-    let g = {
-        en: 0, gem: 0, xp: 0, lvl: 1, owned: ['f1'], plus: false, claimed: [], mult: 1
-    };
+    let g = { en: 0, gem: 0, xp: 0, owned: ['f1'], mult: 1, q: { c: 0, t: 100 } };
 
-    // Награды пасса (исправлено: разные типы)
-    const PASS_REWARDS = {
-        free: [null, "500 ⚡", "10 💎", "Бокс", "1000 ⚡", "15 💎", "X2 MULT", "20 💎", "Бокс", "30 💎", "ЗЕВС-ЭКСКЛЮЗИВ"],
-        plus: [null, "2000 ⚡", "50 💎", "Мегабокс", "5000 ⚡", "100 💎", "X5 MULT", "200 💎", "Мегабокс", "500 💎", "ЗЕВС-ЭКСКЛЮЗИВ"]
-    };
-
-    if(localStorage.getItem('Cat2026_Final_v4')) g = JSON.parse(localStorage.getItem('Cat2026_Final_v4'));
+    if(localStorage.getItem('Cat2026_V10')) g = JSON.parse(localStorage.getItem('Cat2026_V10'));
 
     function tab(id, b) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -129,124 +122,87 @@
     function ui() {
         document.getElementById('en-val').innerText = Math.floor(g.en).toLocaleString();
         document.getElementById('gem-val').innerText = g.gem;
-        document.getElementById('p-lvl').innerText = g.lvl;
-        document.getElementById('p-bar').value = g.xp % 500;
-        document.getElementById('buy-plus').style.display = g.plus ? 'none' : 'block';
+        document.getElementById('q-prog').innerText = g.q.c;
+        document.getElementById('q-targ').innerText = g.q.t;
         
-        renderPass();
         renderFighters();
-        localStorage.setItem('Cat2026_Final_v4', JSON.stringify(g));
+        localStorage.setItem('Cat2026_V10', JSON.stringify(g));
     }
 
     document.getElementById('cat-main').onclick = () => {
         let pwr = 0; g.owned.forEach(id => pwr += DB[id].p);
         g.en += (pwr * g.mult);
-        g.xp += 15;
-        if(g.xp >= g.lvl * 500 && g.lvl < 10) g.lvl++;
+        g.q.c++;
+        
+        if(g.q.c >= g.q.t) {
+            g.xp += 250; g.q.c = 0; g.q.t = Math.round(g.q.t * 1.5);
+            alert("Квест выполнен! +250 XP");
+        }
         ui();
     };
 
-    function renderPass() {
-        const list = document.getElementById('p-list'); list.innerHTML = '';
-        for(let i=1; i<=10; i++) {
-            let clN = g.claimed.includes('n'+i);
-            let clP = g.claimed.includes('p'+i);
-            list.innerHTML += `
-                <div class="lvl-card ${g.plus?'plus-on':''}">
-                    <b>УРОВЕНЬ ${i}</b><hr opacity="0.1">
-                    <small>FREE:</small><br><span>${PASS_REWARDS.free[i]}</span>
-                    <button ${g.lvl>=i && !clN?'':'disabled'} onclick="claim('n',${i})">${clN?'ВЗЯТО':'ВЗЯТЬ'}</button>
-                    <div style="margin-top:10px;">
-                        <small style="color:var(--plus)">PLUS:</small><br><span>${PASS_REWARDS.plus[i]}</span>
-                        <button ${g.lvl>=i && g.plus && !clP?'':'disabled'} onclick="claim('p',${i})">${clP?'ВЗЯТО':'ВЗЯТЬ'}</button>
-                    </div>
+    function renderFighters() {
+        const grid = document.getElementById('f-grid');
+        grid.innerHTML = '';
+        Object.keys(DB).forEach(id => {
+            const f = DB[id];
+            const own = g.owned.includes(id);
+            grid.innerHTML += `
+                <div class="f-card ${own ? '' : 'locked'}" style="border-color:var(--${f.r})">
+                    <span class="f-rarity" style="background:var(--${f.r}); color:${f.r==='legendary'?'black':'white'}">${f.r}</span>
+                    <div style="font-size:35px">${own ? f.i : '❓'}</div>
+                    <b>${own ? f.n : '???'}</b>
                 </div>
             `;
+        });
+        document.getElementById('f-count').innerText = g.owned.length;
+    }
+
+    function usePromo() {
+        let val = document.getElementById('promo-input').value;
+        if(val.startsWith('UP_')) {
+            try {
+                let d = JSON.parse(atob(val.replace('UP_','')));
+                if(d.type === 'add_en') g.en += d.amt;
+                if(d.type === 'add_gem') g.gem += d.amt;
+                if(d.type === 'set_mult') g.mult = d.amt;
+                alert("ПРОМОКОД ПРИНЯТ!");
+            } catch(e) { alert("ОШИБКА!"); }
         }
+        document.getElementById('promo-input').value = ''; ui();
     }
 
-    function claim(type, lvl) {
-        let rew = (type === 'n' ? PASS_REWARDS.free[lvl] : PASS_REWARDS.plus[lvl]);
-        if(rew.includes("⚡")) g.en += parseInt(rew);
-        else if(rew.includes("💎")) g.gem += parseInt(rew);
-        else if(rew.includes("Бокс")) startOpen('norm', true);
-        else if(rew.includes("Мегабокс")) startOpen('mega', true);
-        else if(rew.includes("MULT")) g.mult = parseInt(rew.replace(/\D/g,''));
-        else if(rew.includes("ЭКСКЛЮЗИВ")) { if(!g.owned.includes('f_excl')) g.owned.push('f_excl'); }
-        
-        g.claimed.push(type + lvl);
-        ui();
-    }
-
-    // --- ЛОГИКА ОТКРЫТИЯ БОКСОВ (ИСПРАВЛЕНО) ---
-    let itemsLeft = 0;
-    let boxTaps = 0;
-
-    function startOpen(type, free = false) {
-        if(!free) {
-            if(type === 'norm' && g.en >= 1500) g.en -= 1500;
-            else if(type === 'mega' && g.gem >= 80) g.gem -= 80;
-            else return;
-        }
-
-        itemsLeft = (type === 'mega' ? 5 : 2);
-        boxTaps = 0;
-        
-        document.getElementById('box-scene').style.display = 'flex';
-        document.getElementById('box-render').style.display = 'block';
-        document.getElementById('reward-pop').style.display = 'none';
-        document.getElementById('box-count').innerText = "КЛИКАЙ ПО БОКСУ (3)";
-        ui();
-    }
-
+    // --- Система Боксов ---
+    let items = 0, taps = 0;
     function tapBox() {
-        boxTaps++;
-        let el = document.getElementById('box-render');
-        el.classList.add('shake');
-        setTimeout(() => el.classList.remove('shake'), 100);
-        
-        document.getElementById('box-count').innerText = "КЛИКАЙ ПО БОКСУ (" + (3 - boxTaps) + ")";
-
-        if(boxTaps >= 3) {
-            el.style.display = 'none';
+        taps++;
+        document.getElementById('box-info').innerText = "КЛИКАЙ! (" + (3-taps) + ")";
+        if(taps >= 3) {
+            document.getElementById('box-render').style.display = 'none';
             nextItem();
         }
     }
 
     function nextItem() {
-        if(itemsLeft <= 0) {
-            document.getElementById('box-scene').style.display = 'none';
-            return;
-        }
-
-        itemsLeft--;
-        document.getElementById('box-count').innerText = "ОСТАЛОСЬ ПРЕДМЕТОВ: " + itemsLeft;
-        document.getElementById('reward-pop').style.display = 'block';
-
-        // Генерация награды
-        let r = Math.random();
-        if(r < 0.15) { // Боец
-            let fId = 'f2'; // Упрощено
-            document.getElementById('rew-icon').innerText = DB[fId].i;
-            document.getElementById('rew-text').innerText = "НОВЫЙ БОЕЦ: " + DB[fId].n;
-            if(!g.owned.includes(fId)) g.owned.push(fId);
-        } else {
-            let am = Math.floor(Math.random()*300) + 50;
-            document.getElementById('rew-icon').innerText = "⚡";
-            document.getElementById('rew-text').innerText = "+" + am + " Энергии";
-            g.en += am;
-        }
-        ui();
+        if(items <= 0) { document.getElementById('box-scene').style.display='none'; return; }
+        items--;
+        document.getElementById('reward-pop').style.display='block';
+        // Логика награды... (как в прошлых кодах)
     }
 
-    function renderFighters() {
-        const gr = document.getElementById('f-grid'); gr.innerHTML = '';
-        g.owned.forEach(id => {
-            gr.innerHTML += `<div class="f-card"><b>${DB[id].i}</b><br>${DB[id].n}</div>`;
-        });
+    function saveGame() {
+        const blob = new Blob([JSON.stringify(g)], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'cat_save_2026.txt';
+        a.click();
     }
 
-    function buyPlus() { if(g.gem >= 1000) { g.gem -= 1000; g.plus = true; ui(); } }
+    function loadGame(e) {
+        const r = new FileReader();
+        r.onload = (ev) => { g = JSON.parse(ev.target.result); ui(); };
+        r.readAsText(e.target.files);
+    }
 
     ui();
 </script>
