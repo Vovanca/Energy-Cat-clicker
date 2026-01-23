@@ -3,60 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Energy Cat 2026: Seasons & Boxes</title>
+    <title>Energy Cat 2026: Box Master</title>
     <style>
         :root { 
             --common: #bdc3c7; --rare: #3498db; --epic: #9b59b6; 
             --mythic: #e67e22; --legendary: #f1c40f; --plus: #00ffcc;
             --excl: #ff4757; --bg: #0d0d12; --panel: #1c1c24; 
         }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; user-select: none; overflow-x: hidden; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; user-select: none; overflow: hidden; }
+        
+        /* ГЛАВНЫЙ ЭКРАН ОТКРЫТИЯ БОКСА */
+        #box-scene {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #2c3e50 0%, #000 100%);
+            z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center;
+        }
+        #box-render { font-size: 150px; cursor: pointer; transition: 0.1s; filter: drop-shadow(0 0 30px var(--plus)); }
+        #box-render.shake { animation: shake 0.2s infinite; }
+        @keyframes shake { 0% { transform: rotate(3deg); } 50% { transform: rotate(-3deg); } 100% { transform: rotate(3deg); } }
+        
+        #reward-pop { 
+            display: none; text-align: center; background: rgba(255,255,255,0.1); 
+            padding: 30px; border-radius: 20px; border: 2px solid var(--plus);
+            animation: rewardGet 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes rewardGet { from { transform: scale(0); } to { transform: scale(1.1); } }
+
+        /* ИНТЕРФЕЙС */
         .tabs { position: fixed; bottom: 0; width: 100%; background: var(--panel); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; z-index: 1000; }
         .tab-btn { background: none; border: none; color: #666; font-size: 11px; cursor: pointer; }
         .tab-btn.active { color: var(--plus); font-weight: bold; }
         
-        .screen { display: none; padding: 20px; animation: fadeIn 0.2s; }
+        .screen { display: none; padding: 20px; height: 80vh; overflow-y: auto; }
         .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Окно Бокса */
-        #box-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95);
-            z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center;
-        }
-        #box-model { font-size: 150px; cursor: pointer; transition: 0.1s; filter: drop-shadow(0 0 20px var(--plus)); }
-        #box-model:active { transform: scale(0.8); }
-        #box-info { margin-top: 20px; font-size: 24px; font-weight: bold; color: var(--plus); }
-        .reward-anim { animation: rewardPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes rewardPop { from { transform: scale(0); opacity: 0; } to { transform: scale(1.2); opacity: 1; } }
-
-        /* Пасс и Сезоны */
-        .season-header { background: linear-gradient(45deg, #1c1c24, #3d3d4d); padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid var(--plus); }
-        .pass-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; scrollbar-width: none; }
-        .lvl-card { min-width: 150px; background: #222; padding: 12px; border-radius: 15px; border: 1px solid #444; text-align: center; position: relative; }
-        .lvl-card.active-plus { border-color: var(--plus); background: #1a2525; }
-        .excl-label { background: var(--excl); font-size: 8px; position: absolute; top: -5px; left: 50%; transform: translateX(-50%); padding: 2px 8px; border-radius: 10px; }
-
-        /* Бойцы */
+        .pass-row { display: flex; overflow-x: auto; gap: 15px; padding: 20px 0; }
+        .lvl-card { min-width: 160px; background: #222; padding: 15px; border-radius: 15px; border: 1px solid #444; text-align: center; }
+        .lvl-card.plus-on { border-color: var(--plus); background: #0f1a1a; }
+        
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .f-card { background: #1c1c24; padding: 15px; border-radius: 15px; text-align: center; border: 2px solid #333; }
-        .f-rarity { font-size: 9px; font-weight: bold; text-transform: uppercase; padding: 2px 5px; border-radius: 4px; }
         
-        button { padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-claim { width: 100%; font-size: 10px; margin-top: 5px; background: var(--plus); color: #000; }
-        .btn-claim:disabled { background: #444; color: #888; }
+        button { padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
 
-    <!-- ОКНО ОТКРЫТИЯ БОКСА -->
-    <div id="box-overlay">
-        <div id="box-model">📦</div>
-        <div id="box-info">ОСТАЛОСЬ: 5</div>
-        <div id="reward-display" style="display:none; text-align:center;">
-            <div id="rew-icon" style="font-size: 80px;">🐱</div>
-            <div id="rew-name" style="font-size: 20px; margin-top:10px;">Энергия Кот</div>
+    <!-- СЦЕНА БОКСА -->
+    <div id="box-scene">
+        <div id="box-render" onclick="tapBox()">📦</div>
+        <div id="reward-pop">
+            <div id="rew-icon" style="font-size: 100px;">⭐</div>
+            <h2 id="rew-text">НАГРАДА!</h2>
+            <p id="rew-sub">Нажми, чтобы забрать</p>
+            <button onclick="nextItem()" style="background:var(--plus); color:#000;">ДАЛЕЕ</button>
         </div>
+        <div id="box-count" style="margin-top:20px; font-size:24px; color:var(--plus);">ОСТАЛОСЬ: 0</div>
     </div>
 
     <div style="background: var(--panel); padding: 15px; display: flex; justify-content: space-between; border-bottom: 1px solid #333;">
@@ -66,42 +68,29 @@
 
     <!-- КЛИКЕР -->
     <div id="scr-click" class="screen active">
-        <div style="font-size:100px; margin:20px auto; cursor:pointer;" id="cat-main">🐱</div>
-        <h3 id="cat-rank">1 СЕЗОН: Начало</h3>
-        <div class="season-header">
-            <small>Прогресс Сезона</small>
-            <div style="width:100%; height:6px; background:#333; border-radius:3px; margin-top:5px;">
-                <div id="season-fill" style="height:100%; width:0%; background:var(--plus); border-radius:3px;"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- БОЙЦЫ -->
-    <div id="scr-fighters" class="screen">
-        <h3>Твой Отряд (<span id="f-count">0</span>)</h3>
-        <div class="grid" id="f-grid"></div>
+        <div style="font-size:120px; margin:40px auto; cursor:pointer;" id="cat-main">🐱</div>
+        <h2 id="s-name">СЕЗОН 1: НАЧАЛО</h2>
+        <progress id="p-bar" value="0" max="500" style="width:100%"></progress>
     </div>
 
     <!-- ПАСС -->
     <div id="scr-pass" class="screen">
-        <div class="season-header">
-            <b id="season-name">1 СЕЗОН: НАЧАЛО</b><br>
-            <small>Уровень <span id="p-lvl">1</span> | Опыт: <span id="p-xp">0</span>/500</small>
-        </div>
-        <div id="plus-area">
-            <button onclick="buyPlus()" id="btn-plus" style="width:100%; background:var(--legendary); color:000; margin-bottom:10px; border-radius:10px;">PASS PLUS (1000 💎)</button>
-        </div>
-        <div class="pass-scroll" id="p-scroll"></div>
-        <button id="next-season-btn" onclick="nextSeason()" style="display:none; width:100%; background:var(--plus); color:black; margin-top:20px;">ПЕРЕЙТИ В СЛЕДУЮЩИЙ СЕЗОН</button>
+        <h3>ENERGY PASS (УРОВЕНЬ <span id="p-lvl">1</span>)</h3>
+        <button id="buy-plus" onclick="buyPlus()" style="background:var(--plus); color:black; margin-bottom:10px;">КУПИТЬ PLUS (1000 💎)</button>
+        <div class="pass-row" id="p-list"></div>
+    </div>
+
+    <!-- БОЙЦЫ -->
+    <div id="scr-fighters" class="screen">
+        <h3>ТВОЙ ОТРЯД</h3>
+        <div class="grid" id="f-grid"></div>
     </div>
 
     <!-- МАГАЗИН -->
     <div id="scr-shop" class="screen">
-        <h3>Магазин</h3>
-        <div class="grid">
-            <div class="f-card">📦 МЕГАБОКС<button onclick="initBox('mega')" style="background:var(--legendary); color:black; width:100%; margin-top:10px;">80 💎</button></div>
-            <div class="f-card">📦 ОБЫЧНЫЙ<button onclick="initBox('norm')" style="background:var(--rare); width:100%; margin-top:10px;">1500 ⚡</button></div>
-        </div>
+        <h3>МАГАЗИН</h3>
+        <button onclick="startOpen('norm')" style="background:var(--rare); color:white; margin-bottom:10px;">ОБЫЧНЫЙ БОКС (1500 ⚡)</button>
+        <button onclick="startOpen('mega')" style="background:var(--legendary); color:black;">МЕГАБОКС (80 💎)</button>
     </div>
 
     <div class="tabs">
@@ -112,26 +101,23 @@
     </div>
 
 <script>
-    const SEASONS = [
-        { name: "НАЧАЛО", exclPlus: "f_excl_1", exclNorm: "f_excl_2" },
-        { name: "ТЕНЬ", exclPlus: "f_excl_3", exclNorm: "f_excl_4" }
-    ];
-
     const DB = {
-        f1: { n: "Кот-Новичок", r: "common", p: 1, i: "🐱" },
-        f2: { n: "H2 Энерджи", r: "rare", p: 5, i: "💧" },
-        f_excl_1: { n: "ЗЕВС-ЭКСКЛЮЗИВ", r: "excl", p: 500, i: "🔱" },
-        f_excl_2: { n: "РЫЦАРЬ-ЭКСКЛЮЗИВ", r: "legendary", p: 200, i: "⚔️" },
-        f_excl_3: { n: "ТЕНЕВОЙ БОГ", r: "excl", p: 1000, i: "🌑" },
-        f_excl_4: { n: "НОЧНОЙ ОХОТНИК", r: "legendary", p: 450, i: "🏹" }
+        f1: { n: "Кот-Новичок", p: 1, i: "🐱", r: "common" },
+        f2: { n: "H2 Энерджи", p: 5, i: "💧", r: "rare" },
+        f_excl: { n: "ЗЕВС-ЭКСКЛЮЗИВ", p: 500, i: "🔱", r: "excl" }
     };
 
     let g = {
-        en: 0, gem: 0, xp: 0, owned: ['f1'], lvl: 1, plus: false, 
-        claimed: [], season: 0, mult: 1
+        en: 0, gem: 0, xp: 0, lvl: 1, owned: ['f1'], plus: false, claimed: [], mult: 1
     };
 
-    if(localStorage.getItem('Cat2026_Final_v2')) g = JSON.parse(localStorage.getItem('Cat2026_Final_v2'));
+    // Награды пасса (исправлено: разные типы)
+    const PASS_REWARDS = {
+        free: [null, "500 ⚡", "10 💎", "Бокс", "1000 ⚡", "15 💎", "X2 MULT", "20 💎", "Бокс", "30 💎", "ЗЕВС-ЭКСКЛЮЗИВ"],
+        plus: [null, "2000 ⚡", "50 💎", "Мегабокс", "5000 ⚡", "100 💎", "X5 MULT", "200 💎", "Мегабокс", "500 💎", "ЗЕВС-ЭКСКЛЮЗИВ"]
+    };
+
+    if(localStorage.getItem('Cat2026_Final_v4')) g = JSON.parse(localStorage.getItem('Cat2026_Final_v4'));
 
     function tab(id, b) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -144,49 +130,35 @@
         document.getElementById('en-val').innerText = Math.floor(g.en).toLocaleString();
         document.getElementById('gem-val').innerText = g.gem;
         document.getElementById('p-lvl').innerText = g.lvl;
-        document.getElementById('p-xp').innerText = g.xp % 500;
-        document.getElementById('season-name').innerText = (g.season + 1) + " СЕЗОН: " + SEASONS[g.season].name;
-        document.getElementById('season-fill').style.width = (g.lvl / 30 * 100) + '%';
+        document.getElementById('p-bar').value = g.xp % 500;
+        document.getElementById('buy-plus').style.display = g.plus ? 'none' : 'block';
         
-        renderFighters();
         renderPass();
-        
-        if(g.lvl >= 30 && g.season < SEASONS.length - 1) {
-            document.getElementById('next-season-btn').style.display = 'block';
-        }
-
-        localStorage.setItem('Cat2026_Final_v2', JSON.stringify(g));
+        renderFighters();
+        localStorage.setItem('Cat2026_Final_v4', JSON.stringify(g));
     }
 
     document.getElementById('cat-main').onclick = () => {
-        let pwr = 0; g.owned.forEach(id => pwr += (DB[id] ? DB[id].p : 0));
+        let pwr = 0; g.owned.forEach(id => pwr += DB[id].p);
         g.en += (pwr * g.mult);
-        g.xp += 10;
-        if(g.xp >= g.lvl * 500 && g.lvl < 30) g.lvl++;
+        g.xp += 15;
+        if(g.xp >= g.lvl * 500 && g.lvl < 10) g.lvl++;
         ui();
     };
 
     function renderPass() {
-        const sc = document.getElementById('p-scroll'); sc.innerHTML = '';
-        const sData = SEASONS[g.season];
-        document.getElementById('btn-plus').style.display = g.plus ? 'none' : 'block';
-
-        for(let i=1; i<=30; i++) {
-            let clN = g.claimed.includes(g.season + 'n' + i);
-            let clP = g.claimed.includes(g.season + 'p' + i);
-            
-            let rewN = (i === 30) ? DB[sData.exclNorm].n : "Бокс";
-            let rewP = (i === 30) ? DB[sData.exclPlus].n : "Мегабокс";
-
-            sc.innerHTML += `
-                <div class="lvl-card ${g.plus?'active-plus':''}">
-                    ${i===30?'<div class="excl-label">MAX LEVEL</div>':''}
+        const list = document.getElementById('p-list'); list.innerHTML = '';
+        for(let i=1; i<=10; i++) {
+            let clN = g.claimed.includes('n'+i);
+            let clP = g.claimed.includes('p'+i);
+            list.innerHTML += `
+                <div class="lvl-card ${g.plus?'plus-on':''}">
                     <b>УРОВЕНЬ ${i}</b><hr opacity="0.1">
-                    <small>БЕСПЛАТНО:</small><br><span style="font-size:10px">${rewN}</span>
-                    <button class="btn-claim" ${g.lvl>=i && !clN?'':'disabled'} onclick="claim('n',${i})">${clN?'ВЗЯТО':'ВЗЯТЬ'}</button>
+                    <small>FREE:</small><br><span>${PASS_REWARDS.free[i]}</span>
+                    <button ${g.lvl>=i && !clN?'':'disabled'} onclick="claim('n',${i})">${clN?'ВЗЯТО':'ВЗЯТЬ'}</button>
                     <div style="margin-top:10px;">
-                        <small style="color:var(--plus)">PLUS:</small><br><span style="font-size:10px">${rewP}</span>
-                        <button class="btn-claim" ${g.lvl>=i && g.plus && !clP?'':'disabled'} onclick="claim('p',${i})">${clP?'ВЗЯТО':'ВЗЯТЬ'}</button>
+                        <small style="color:var(--plus)">PLUS:</small><br><span>${PASS_REWARDS.plus[i]}</span>
+                        <button ${g.lvl>=i && g.plus && !clP?'':'disabled'} onclick="claim('p',${i})">${clP?'ВЗЯТО':'ВЗЯТЬ'}</button>
                     </div>
                 </div>
             `;
@@ -194,111 +166,87 @@
     }
 
     function claim(type, lvl) {
-        const sData = SEASONS[g.season];
-        if(lvl === 30) {
-            let id = (type === 'n') ? sData.exclNorm : sData.exclPlus;
-            if(!g.owned.includes(id)) g.owned.push(id);
-            alert("ВЫ ПОЛУЧИЛИ ЭКСКЛЮЗИВА: " + DB[id].n);
-        } else {
-            initBox(type === 'n' ? 'norm' : 'mega');
-        }
-        g.claimed.push(g.season + type + lvl);
-        ui();
-    }
-
-    // --- СИСТЕМА БОКСОВ ---
-    let boxClicks = 0;
-    let itemsLeft = 0;
-    let currentBoxType = '';
-
-    function initBox(type) {
-        if(type === 'norm' && g.en < 1500 && arguments[1] !== true) return;
-        if(type === 'mega' && g.gem < 80 && arguments[1] !== true) return;
-
-        if(arguments[1] !== true) { // Если не бесплатный из пасса
-            if(type === 'norm') g.en -= 1500; else g.gem -= 80;
-        }
-
-        currentBoxType = type;
-        boxClicks = 0;
-        itemsLeft = type === 'mega' ? 5 : 2;
+        let rew = (type === 'n' ? PASS_REWARDS.free[lvl] : PASS_REWARDS.plus[lvl]);
+        if(rew.includes("⚡")) g.en += parseInt(rew);
+        else if(rew.includes("💎")) g.gem += parseInt(rew);
+        else if(rew.includes("Бокс")) startOpen('norm', true);
+        else if(rew.includes("Мегабокс")) startOpen('mega', true);
+        else if(rew.includes("MULT")) g.mult = parseInt(rew.replace(/\D/g,''));
+        else if(rew.includes("ЭКСКЛЮЗИВ")) { if(!g.owned.includes('f_excl')) g.owned.push('f_excl'); }
         
-        document.getElementById('box-overlay').style.display = 'flex';
-        document.getElementById('box-model').style.display = 'block';
-        document.getElementById('reward-display').style.display = 'none';
-        document.getElementById('box-info').innerText = "КЛИКАЙ ПО БОКСУ!";
+        g.claimed.push(type + lvl);
         ui();
     }
 
-    document.getElementById('box-model').onclick = function() {
-        boxClicks++;
-        this.style.transform = "scale(1.2)";
-        setTimeout(() => this.style.transform = "scale(1)", 50);
+    // --- ЛОГИКА ОТКРЫТИЯ БОКСОВ (ИСПРАВЛЕНО) ---
+    let itemsLeft = 0;
+    let boxTaps = 0;
 
-        if(boxClicks >= 3) {
-            this.style.display = 'none';
-            showNextReward();
+    function startOpen(type, free = false) {
+        if(!free) {
+            if(type === 'norm' && g.en >= 1500) g.en -= 1500;
+            else if(type === 'mega' && g.gem >= 80) g.gem -= 80;
+            else return;
         }
-    };
 
-    function showNextReward() {
+        itemsLeft = (type === 'mega' ? 5 : 2);
+        boxTaps = 0;
+        
+        document.getElementById('box-scene').style.display = 'flex';
+        document.getElementById('box-render').style.display = 'block';
+        document.getElementById('reward-pop').style.display = 'none';
+        document.getElementById('box-count').innerText = "КЛИКАЙ ПО БОКСУ (3)";
+        ui();
+    }
+
+    function tapBox() {
+        boxTaps++;
+        let el = document.getElementById('box-render');
+        el.classList.add('shake');
+        setTimeout(() => el.classList.remove('shake'), 100);
+        
+        document.getElementById('box-count').innerText = "КЛИКАЙ ПО БОКСУ (" + (3 - boxTaps) + ")";
+
+        if(boxTaps >= 3) {
+            el.style.display = 'none';
+            nextItem();
+        }
+    }
+
+    function nextItem() {
         if(itemsLeft <= 0) {
-            document.getElementById('box-overlay').style.display = 'none';
+            document.getElementById('box-scene').style.display = 'none';
             return;
         }
 
         itemsLeft--;
-        document.getElementById('box-info').innerText = "ОСТАЛОСЬ ПРЕДМЕТОВ: " + itemsLeft;
-        document.getElementById('reward-display').style.display = 'block';
-        document.getElementById('reward-display').className = 'reward-anim';
+        document.getElementById('box-count').innerText = "ОСТАЛОСЬ ПРЕДМЕТОВ: " + itemsLeft;
+        document.getElementById('reward-pop').style.display = 'block';
 
-        // Логика выпадения
+        // Генерация награды
         let r = Math.random();
-        if(r < 0.1) { // Выпал боец
-            let keys = Object.keys(DB).filter(k => !k.includes('excl'));
-            let fId = keys[Math.floor(Math.random() * keys.length)];
+        if(r < 0.15) { // Боец
+            let fId = 'f2'; // Упрощено
             document.getElementById('rew-icon').innerText = DB[fId].i;
-            document.getElementById('rew-name').innerText = DB[fId].n;
+            document.getElementById('rew-text').innerText = "НОВЫЙ БОЕЦ: " + DB[fId].n;
             if(!g.owned.includes(fId)) g.owned.push(fId);
-        } else { // Ресурсы
-            let amount = Math.floor(Math.random() * 500) + 100;
+        } else {
+            let am = Math.floor(Math.random()*300) + 50;
             document.getElementById('rew-icon').innerText = "⚡";
-            document.getElementById('rew-name').innerText = "+" + amount + " Энергии";
-            g.en += amount;
+            document.getElementById('rew-text').innerText = "+" + am + " Энергии";
+            g.en += am;
         }
-
-        // Клик для следующего предмета
-        document.getElementById('box-overlay').onclick = function() {
-            document.getElementById('box-overlay').onclick = null;
-            showNextReward();
-        };
+        ui();
     }
 
     function renderFighters() {
-        const grid = document.getElementById('f-grid'); grid.innerHTML = '';
+        const gr = document.getElementById('f-grid'); gr.innerHTML = '';
         g.owned.forEach(id => {
-            const f = DB[id];
-            grid.innerHTML += `
-                <div class="f-card" style="border-color:var(--${f.r})">
-                    <span class="f-rarity" style="background:var(--${f.r})">${f.r}</span>
-                    <div style="font-size:30px">${f.i}</div>
-                    <b>${f.n}</b>
-                </div>
-            `;
+            gr.innerHTML += `<div class="f-card"><b>${DB[id].i}</b><br>${DB[id].n}</div>`;
         });
-        document.getElementById('f-count').innerText = g.owned.length;
     }
 
-    function buyPlus() {
-        if(g.gem >= 1000) { g.gem -= 1000; g.plus = true; ui(); }
-    }
-
-    function nextSeason() {
-        g.season++; g.lvl = 1; g.xp = 0; g.plus = false;
-        document.getElementById('next-season-btn').style.display = 'none';
-        alert("ДОБРО ПОЖАЛОВАТЬ В НОВЫЙ СЕЗОН!");
-        ui();
-    }
+    function buyPlus() { if(g.gem >= 1000) { g.gem -= 1000; g.plus = true; ui(); } }
 
     ui();
 </script>
