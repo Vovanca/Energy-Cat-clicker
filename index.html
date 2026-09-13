@@ -2,302 +2,475 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Energy Cat 2026: Exclusive Update</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Cat: Universal Ascension (Endless RPG)</title>
     <style>
-        :root { 
-            --common: #bdc3c7; --rare: #3498db; --epic: #9b59b6; 
-            --mythic: #e67e22; --legendary: #f1c40f; --plus: #00ffcc;
-            --excl: #ff4757; --bg: #0d0d12; --panel: #1c1c24; 
+        :root {
+            --bg: #090a0f;
+            --panel: #131722;
+            --accent: #00f2fe;
+            --accent-purple: #9d50bb;
+            --text: #e1e6ed;
+            --gold: #ffd700;
         }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 85px; user-select: none; overflow-x: hidden; }
-        
-        .top-bar { background: var(--panel); padding: 15px; display: flex; justify-content: space-around; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #333; }
-        .tabs { position: fixed; bottom: 0; width: 100%; background: var(--panel); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; z-index: 1000; }
-        .tab-btn { background: none; border: none; color: #555; font-size: 10px; cursor: pointer; text-transform: uppercase; }
-        .tab-btn.active { color: var(--plus); border-bottom: 2px solid var(--plus); }
 
-        .screen { display: none; padding: 20px; height: 85vh; overflow-y: auto; box-sizing: border-box; }
-        .screen.active { display: block; }
+        * { box-sizing: border-box; user-select: none; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-        /* Элементы кликера */
-        #cat-main { font-size: 110px; cursor: pointer; transition: 0.1s; display: block; margin: 20px auto; width: fit-content; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); }
-        #cat-main:active { transform: scale(0.85); }
-        .quest-box { background: #1a1a20; padding: 15px; border-radius: 12px; border-left: 4px solid var(--plus); margin-top: 20px; }
+        /* Боковое меню навигации */
+        .sidebar {
+            width: 220px;
+            background: var(--panel);
+            border-right: 1px solid #232a3b;
+            display: flex;
+            flex-direction: column;
+            padding: 15px 0;
+        }
 
-        /* Бойцы */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .f-card { background: #1c1c24; padding: 15px; border-radius: 15px; text-align: center; border: 2px solid #333; position: relative; }
-        .f-card.locked { opacity: 0.3; filter: grayscale(1); border: 1px dashed #444; }
-        .f-rarity { font-size: 8px; font-weight: bold; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
+        .logo {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-        /* Энергия Пасс */
-        .pass-header { background: #1c1c24; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--plus); }
-        .xp-bar { width: 100%; height: 10px; background: #333; border-radius: 5px; margin: 10px 0; overflow: hidden; }
-        .xp-fill { height: 100%; background: var(--plus); width: 0%; transition: 0.3s; }
-        .pass-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 10px 0; scrollbar-width: none; }
-        .lvl-card { min-width: 150px; background: #222; padding: 15px; border-radius: 15px; border: 1px solid #444; text-align: center; position: relative; }
-        .lvl-card.is-plus { border-color: var(--plus); background: #0f1f1f; }
-        .excl-tag { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: var(--excl); font-size: 8px; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #78849e;
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            border-left: 3px solid transparent;
+        }
 
-        /* Открытие Боксов */
-        #box-scene { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        #box-render { font-size: 130px; cursor: pointer; transition: 0.1s; }
-        #reward-pop { display: none; text-align: center; background: #1c1c24; padding: 40px; border-radius: 30px; border: 2px solid var(--plus); animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes pop { from { transform: scale(0); } to { transform: scale(1.1); } }
+        .nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+        .nav-btn.active {
+            color: var(--accent);
+            background: rgba(0, 242, 254, 0.05);
+            border-left-color: var(--accent);
+        }
 
-        input { width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: #0f0; border-radius: 10px; margin-bottom: 10px; }
-        button { padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
-        .btn-claim { background: var(--plus); color: black; margin-top: 8px; font-size: 10px; }
-        .btn-claim:disabled { background: #444; color: #888; }
+        /* Главная область */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Верхняя панель ресурсов */
+        .top-res {
+            background: var(--panel);
+            padding: 15px 30px;
+            display: flex;
+            gap: 40px;
+            border-bottom: 1px solid #232a3b;
+        }
+
+        .res-item { display: flex; flex-direction: column; }
+        .res-label { font-size: 11px; color: #6b7a99; text-transform: uppercase; }
+        .res-val { font-size: 20px; font-weight: bold; color: #fff; }
+
+        /* Вкладки */
+        .tab-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: none;
+        }
+        .tab-content.active { display: block; }
+
+        /* Кликер и Бои */
+        .clicker-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .canvas-card {
+            background: var(--panel);
+            border-radius: 12px;
+            border: 1px solid #232a3b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #gameCanvas {
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Панель магазинов и построек */
+        .shop-panel {
+            background: var(--panel);
+            border-radius: 12px;
+            border: 1px solid #232a3b;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+        }
+
+        .shop-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #232a3b;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .shop-item:hover { border-color: #3b465e; }
+
+        .btn-buy {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 8px 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-buy:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Дерево Престижа */
+        .prestige-card {
+            background: linear-gradient(135deg, #1e1035, #131722);
+            border: 1px solid var(--accent-purple);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .btn-ascend {
+            background: var(--accent-purple);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(157, 80, 187, 0.4);
+        }
     </style>
 </head>
 <body>
 
-    <!-- СЦЕНА БОКСА -->
-    <div id="box-scene">
-        <div id="box-render" onclick="tapBox()">📦</div>
-        <div id="reward-pop">
-            <div id="rew-icon" style="font-size: 90px;">⭐</div>
-            <h2 id="rew-name" style="margin:15px 0;">Награда</h2>
-            <button onclick="nextItem()" style="background:var(--plus); color:black; font-size:18px;">ЗАБРАТЬ</button>
+    <div class="sidebar">
+        <div class="logo">⚡ Energy Cat</div>
+        <button class="nav-btn active" onclick="switchTab('tab-core')">🛸 Ядро и Бой</button>
+        <button class="nav-btn" onclick="switchTab('tab-buildings')">🏭 Генераторы</button>
+        <button class="nav-btn" onclick="switchTab('tab-ascend')">🌌 Перерождение</button>
+    </div>
+
+    <div class="main-content">
+        <div class="top-res">
+            <div class="res-item">
+                <span class="res-label">Энергия</span>
+                <span class="res-val" id="res-energy">0</span>
+            </div>
+            <div class="res-item">
+                <span class="res-label">Прибыль / сек</span>
+                <span class="res-val" id="res-eps" style="color:var(--accent)">0</span>
+            </div>
+            <div class="res-item">
+                <span class="res-label">Темная Материя</span>
+                <span class="res-val" id="res-dm" style="color:var(--accent-purple)">0</span>
+            </div>
+            <div class="res-item">
+                <span class="res-label">Волна</span>
+                <span class="res-val" id="res-wave" style="color:var(--gold)">1</span>
+            </div>
         </div>
-        <div id="box-info" style="margin-top:20px; color:var(--plus); font-size:20px;">ОСТАЛОСЬ КЛИКОВ: 3</div>
-    </div>
 
-    <div class="top-bar">
-        <div style="color:var(--orange); font-weight:bold;">⚡ <span id="en-val">0</span></div>
-        <div style="color:var(--purple); font-weight:bold;">💎 <span id="gem-val">0</span></div>
-    </div>
-
-    <!-- 1. КЛИКЕР -->
-    <div id="scr-click" class="screen active">
-        <div id="cat-main">🐱</div>
-        <h2 id="cat-rank">Обычный Котёнок</h2>
-        <div class="quest-box">
-            <b style="color:var(--plus)">БЕСКОНЕЧНЫЙ КВЕСТ</b><br>
-            <span id="q-txt">Нажми 100 раз</span>: <span id="q-prog">0</span>/<span id="q-targ">100</span>
-            <div style="font-size:10px; opacity:0.5; margin-top:5px;">Награда: +250 XP Энергия Пасса</div>
+        <!-- 1. ЯДРО И БОЙ -->
+        <div id="tab-core" class="tab-content active">
+            <div class="clicker-layout">
+                <div class="canvas-card">
+                    <canvas id="gameCanvas" width="500" height="400"></canvas>
+                </div>
+                <div class="shop-panel">
+                    <h3>⚡ Улучшение Клика</h3>
+                    <div class="shop-item">
+                        <div>
+                            <b>Сила Клика</b><br>
+                            <small>Уровень: <span id="click-lvl">1</span></small>
+                        </div>
+                        <button class="btn-buy" id="btn-up-click" onclick="buyClickUpgrade()">15 ⚡</button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <!-- 2. БОЙЦЫ -->
-    <div id="scr-fighters" class="screen">
-        <h3>КОЛЛЕКЦИЯ (<span id="f-count">0</span>/18)</h3>
-        <div class="grid" id="f-grid"></div>
-    </div>
-
-    <!-- 3. ПАСС -->
-    <div id="scr-pass" class="screen">
-        <div class="pass-header">
-            <b style="color:var(--plus)">ENERGY PASS УРОВЕНЬ <span id="p-lvl">1</span></b>
-            <div class="xp-bar"><div class="xp-fill" id="xp-f"></div></div>
-            <small>Опыт: <span id="xp-v">0</span>/500 XP</small>
+        <!-- 2. ГЕНЕРАТОРЫ -->
+        <div id="tab-buildings" class="tab-content">
+            <h2>🏭 Постройки Энергии</h2>
+            <div class="shop-panel" id="buildings-list"></div>
         </div>
-        <button id="buy-plus" onclick="buyPlus()" style="background:var(--legendary); color:black; margin-bottom:15px; box-shadow: 0 0 10px rgba(241,196,15,0.3);">АКТИВИРОВАТЬ PLUS (1000 💎)</button>
-        <div class="pass-scroll" id="p-row"></div>
-    </div>
 
-    <!-- 4. МАГАЗИН -->
-    <div id="scr-shop" class="screen">
-        <h3>МАГАЗИН</h3>
-        <div class="grid">
-            <div class="f-card">📦 Обычный Бокс<button onclick="openBox('en')" style="background:var(--rare); margin-top:10px; color:white;">1,500 ⚡</button></div>
-            <div class="f-card">💎 Мегабокс<button onclick="openBox('gem')" style="background:var(--legendary); color:black; margin-top:10px;">80 💎</button></div>
+        <!-- 3. ПЕРЕРОЖДЕНИЕ -->
+        <div id="tab-ascend" class="tab-content">
+            <div class="prestige-card">
+                <h2>🌌 Астральное Перерождение</h2>
+                <p>Сбросьте все постройки и энергию, чтобы сжать Вселенную и получить **Темную Материю**.</p>
+                <p>Вы получите: <b id="dm-gain" style="color:var(--accent-purple); font-size: 20px;">0</b> DM</p>
+                <button class="btn-ascend" onclick="ascend()">СОВЕРШИТЬ ПЕРЕРОЖДЕНИЕ</button>
+            </div>
         </div>
-    </div>
-
-    <!-- 5. КОДЫ -->
-    <div id="scr-codes" class="screen">
-        <h3>АКТИВАЦИЯ</h3>
-        <input type="text" id="promo-in" placeholder="Введите UP_ код или 100en...">
-        <button onclick="usePromo()" style="background:var(--plus); color:black;">ОК</button>
-        <div style="margin-top:50px;">
-            <button onclick="saveTxt()" style="background:#222; color:#555; font-size:10px;">💾 Скачать .txt</button>
-            <button onclick="document.getElementById('l-f').click()" style="background:#222; color:#555; font-size:10px; margin-top:5px;">📂 Загрузить .txt</button>
-            <input type="file" id="l-f" style="display:none" onchange="loadTxt(event)">
-        </div>
-    </div>
-
-    <div class="tabs">
-        <div class="tab-btn active" onclick="tab('scr-click', this)">Клик</div>
-        <div class="tab-btn" onclick="tab('scr-fighters', this)">Бойцы</div>
-        <div class="tab-btn" onclick="tab('scr-pass', this)">Пасс</div>
-        <div class="tab-btn" onclick="tab('scr-shop', this)">Шоп</div>
-        <div class="tab-btn" onclick="tab('scr-codes', this)">Коды</div>
     </div>
 
 <script>
-    const DB = {
-        f1: { n: "Энерго Кот", r: "common", p: 1, i: "🐱" },
-        f2: { n: "H2 Кот", r: "common", p: 2, i: "💧" },
-        f3: { n: "Плащ", r: "rare", p: 5, i: "🧥" },
-        f4: { n: "Сильный Кот", r: "rare", p: 10, i: "💪" },
-        f5: { n: "Электро", r: "epic", p: 25, i: "⚡" },
-        f6: { n: "Лава", r: "epic", p: 35, i: "🔥" },
-        f7: { n: "Кибер-Кот", r: "mythic", p: 75, i: "🤖" },
-        f8: { n: "Призрак", r: "mythic", p: 100, i: "👻" },
-        f9: { n: "Зевс", r: "legendary", p: 250, i: "🔱" },
-        f10: { n: "Ниндзя", r: "rare", p: 15, i: "🥷" },
-        f11: { n: "Атомный", r: "legendary", p: 500, i: "☢️" },
-        f12: { n: "Космос", r: "mythic", p: 150, i: "🪐" },
-        f13: { n: "Пустота", r: "legendary", p: 800, i: "🌀" },
-        f14: { n: "Меха-Кот", r: "mythic", p: 200, i: "🐱‍🚀" },
-        f15: { n: "Демон", r: "legendary", p: 999, i: "👿" },
-        f16: { n: "Бог Кот", r: "legendary", p: 1500, i: "⛩️" },
-        excl_norm: { n: "ЛЕГЕНДАРНЫЙ ЭКСКЛЮЗИВ", r: "legendary", p: 2500, i: "🏆" },
-        excl_plus: { n: "ЭПИЧЕСКИЙ ЭКСКЛЮЗИВ", r: "excl", p: 5000, i: "👑" }
+    // --- Состояние Игры ---
+    const state = {
+        energy: 0,
+        totalEnergy: 0,
+        clickPower: 1,
+        clickLvl: 1,
+        darkMatter: 0,
+        wave: 1,
+        enemyHp: 50,
+        enemyMaxHp: 50,
+        buildings: [
+            { id: 'b1', name: 'Миска с Мятой', count: 0, baseCost: 15, baseEps: 1 },
+            { id: 'b2', name: 'Лазерная Указка', count: 0, baseCost: 100, baseEps: 8 },
+            { id: 'b3', name: 'Кото-Генератор', count: 0, baseCost: 1100, baseEps: 48 },
+            { id: 'b4', name: 'Орбитальная Лавка', count: 0, baseCost: 12000, baseEps: 260 }
+        ]
     };
 
-    let g = { en: 0, gem: 0, xp: 0, lvl: 1, owned: ['f1'], plus: false, claimed: [], q: { c: 0, t: 100 }, mult: 1 };
+    // --- Инициализация Canvas ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-    if(localStorage.getItem('EnergyCat_v2026_Final')) g = JSON.parse(localStorage.getItem('EnergyCat_v2026_Final'));
+    let particles = [];
 
-    function tab(id, b) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        b.classList.add('active');
+    class Particle {
+        constructor(x, y, text, color) {
+            this.x = x; this.y = y;
+            this.text = text;
+            this.color = color;
+            this.life = 1.0;
+            this.vy = -2;
+        }
+        update() {
+            this.y += this.vy;
+            this.life -= 0.02;
+        }
+        draw() {
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, this.life);
+            ctx.fillStyle = this.color;
+            ctx.font = 'bold 16px Segoe UI';
+            ctx.fillText(this.text, this.x, this.y);
+            ctx.restore();
+        }
     }
 
-    function ui() {
-        document.getElementById('en-val').innerText = Math.floor(g.en).toLocaleString();
-        document.getElementById('gem-val').innerText = g.gem;
-        document.getElementById('p-lvl').innerText = g.lvl;
-        document.getElementById('xp-v').innerText = g.xp % 500;
-        document.getElementById('xp-f').style.width = ((g.xp % 500) / 500 * 100) + '%';
-        document.getElementById('q-prog').innerText = g.q.c;
-        document.getElementById('q-targ').innerText = g.q.t;
-        document.getElementById('buy-plus').style.display = g.plus ? 'none' : 'block';
-        
-        let c = document.getElementById('cat-main');
-        if(g.en >= 100000) c.innerText = '🦁'; else if(g.en >= 15000) c.innerText = '🐯';
+    // Обработка Клика
+    canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-        renderFighters();
-        renderPass();
-        localStorage.setItem('EnergyCat_v2026_Final', JSON.stringify(g));
+        // Клик по центру (Ядро)
+        const dx = x - canvas.width / 2;
+        const dy = y - canvas.height / 2;
+        if (Math.sqrt(dx*dx + dy*dy) < 70) {
+            const gain = state.clickPower * (1 + state.darkMatter * 0.1);
+            addEnergy(gain);
+            damageEnemy(gain);
+            particles.push(new Particle(x, y, `+${formatNum(gain)}`, '#00f2fe'));
+        }
+    });
+
+    function addEnergy(amount) {
+        state.energy += amount;
+        state.totalEnergy += amount;
     }
 
-    document.getElementById('cat-main').onclick = () => {
-        let pwr = 0; g.owned.forEach(id => pwr += DB[id].p);
-        g.en += (pwr * g.mult);
-        g.q.c++;
-        if(g.q.c >= g.q.t) { g.xp += 300; g.q.c = 0; g.q.t = Math.round(g.q.t * 1.4); }
-        if(g.lvl < 30 && g.xp >= g.lvl * 500) g.lvl++;
-        ui();
-    };
+    function damageEnemy(dmg) {
+        state.enemyHp -= dmg;
+        if (state.enemyHp <= 0) {
+            state.wave++;
+            state.enemyMaxHp = Math.round(50 * Math.pow(1.25, state.wave - 1));
+            state.enemyHp = state.enemyMaxHp;
+            addEnergy(state.enemyMaxHp * 0.5);
+        }
+    }
 
-    function renderFighters() {
-        const grid = document.getElementById('f-grid'); grid.innerHTML = '';
-        Object.keys(DB).forEach(id => {
-            const f = DB[id]; const own = g.owned.includes(id);
-            grid.innerHTML += `
-                <div class="f-card ${own?'':'locked'}" style="border-color:var(--${f.r})">
-                    <span class="f-rarity" style="background:var(--${f.r}); color:${f.r==='legendary'||f.r==='excl'?'black':'white'}">${f.r}</span>
-                    <div style="font-size:35px">${own ? f.i : '❓'}</div>
-                    <b>${own ? f.n : '???'}</b>
-                </div>`;
+    function getEps() {
+        let eps = 0;
+        state.buildings.forEach(b => eps += b.count * b.baseEps);
+        return eps * (1 + state.darkMatter * 0.1);
+    }
+
+    // --- Магазин и Покупки ---
+    function buyClickUpgrade() {
+        const cost = Math.round(15 * Math.pow(1.5, state.clickLvl - 1));
+        if (state.energy >= cost) {
+            state.energy -= cost;
+            state.clickLvl++;
+            state.clickPower += 1;
+            updateUI();
+        }
+    }
+
+    function buyBuilding(index) {
+        const b = state.buildings[index];
+        const cost = Math.round(b.baseCost * Math.pow(1.15, b.count));
+        if (state.energy >= cost) {
+            state.energy -= cost;
+            b.count++;
+            updateUI();
+        }
+    }
+
+    function ascend() {
+        const dmGain = Math.floor(15 * Math.pow(state.totalEnergy / 1e6, 0.2));
+        if (dmGain > 0) {
+            state.darkMatter += dmGain;
+            state.energy = 0;
+            state.clickPower = 1;
+            state.clickLvl = 1;
+            state.wave = 1;
+            state.enemyHp = 50;
+            state.buildings.forEach(b => b.count = 0);
+            switchTab('tab-core');
+            updateUI();
+        } else {
+            alert('Нужно накопить больше энергии для перерождения!');
+        }
+    }
+
+    // --- Отрисовка Игрового Мира ---
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Ядро Клика (Кот)
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, 65, 0, Math.PI * 2);
+        ctx.fillStyle = '#1c2333';
+        ctx.strokeStyle = '#00f2fe';
+        ctx.lineWidth = 4;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#00f2fe';
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.font = '50px Segoe UI';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🐱', cx, cy);
+
+        // Враг / Мышь
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(50, 40, 400, 12);
+        ctx.fillStyle = '#2ecc71';
+        ctx.fillRect(50, 40, (state.enemyHp / state.enemyMaxHp) * 400, 12);
+
+        ctx.font = 'bold 14px Segoe UI';
+        ctx.fillStyle = '#fff';
+        ctx.fillText(`ВРАГ (Волна ${state.wave}): ${formatNum(state.enemyHp)} / ${formatNum(state.enemyMaxHp)}`, cx, 25);
+
+        // Частицы
+        particles.forEach((p, index) => {
+            p.update();
+            p.draw();
+            if (p.life <= 0) particles.splice(index, 1);
         });
-        document.getElementById('f-count').innerText = g.owned.length;
+
+        requestAnimationFrame(render);
     }
 
-    function renderPass() {
-        const row = document.getElementById('p-row'); row.innerHTML = '';
-        for(let i=1; i<=30; i++) {
-            let clN = g.claimed.includes('n'+i); let clP = g.claimed.includes('p'+i);
-            let isFinal = (i === 30);
-            row.innerHTML += `
-                <div class="lvl-card ${g.plus?'is-plus':''}">
-                    ${isFinal?'<div class="excl-tag">ФИНАЛ</div>':''}
-                    <b>УРОВЕНЬ ${i}</b><hr opacity="0.1">
-                    <small>БЕСПЛАТНО:</small><br>
-                    <span style="font-size:10px">${isFinal?'ЛЕГ. ЭКСКЛЮЗИВ':'15 💎'}</span>
-                    <button class="btn-claim" ${g.lvl>=i && !clN?'':'disabled'} onclick="claim('n',${i})">${clN?'ВЗЯТО':'ВЗЯТЬ'}</button>
-                    <div style="margin-top:10px; border-top:1px solid #444; padding-top:5px;">
-                        <small style="color:var(--plus)">PLUS:</small><br>
-                        <span style="font-size:10px">${isFinal?'ЭПИК ЭКСКЛЮЗИВ':'БОКС'}</span>
-                        <button class="btn-claim" ${g.lvl>=i && g.plus && !clP?'':'disabled'} onclick="claim('p',${i})">${clP?'ВЗЯТО':'ВЗЯТЬ'}</button>
+    // --- Интерфейс и Вкладки ---
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function formatNum(n) {
+        if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+        if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+        if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+        return Math.floor(n);
+    }
+
+    function updateUI() {
+        document.getElementById('res-energy').innerText = formatNum(state.energy);
+        document.getElementById('res-eps').innerText = formatNum(getEps());
+        document.getElementById('res-dm').innerText = state.darkMatter;
+        document.getElementById('res-wave').innerText = state.wave;
+
+        // Обновление Клика
+        const clickCost = Math.round(15 * Math.pow(1.5, state.clickLvl - 1));
+        document.getElementById('click-lvl').innerText = state.clickLvl;
+        const btnClick = document.getElementById('btn-up-click');
+        btnClick.innerText = `${formatNum(clickCost)} ⚡`;
+        btnClick.disabled = state.energy < clickCost;
+
+        // Обновление Построек
+        const bList = document.getElementById('buildings-list');
+        bList.innerHTML = '';
+        state.buildings.forEach((b, index) => {
+            const cost = Math.round(b.baseCost * Math.pow(1.15, b.count));
+            bList.innerHTML += `
+                <div class="shop-item">
+                    <div>
+                        <b>${b.name}</b> (${b.count})<br>
+                        <small>+${formatNum(b.baseEps)} ⚡/сек</small>
                     </div>
-                </div>`;
+                    <button class="btn-buy" ${state.energy < cost ? 'disabled' : ''} onclick="buyBuilding(${index})">
+                        ${formatNum(cost)} ⚡
+                    </button>
+                </div>
+            `;
+        });
+
+        // Престиж
+        const dmGain = Math.floor(15 * Math.pow(state.totalEnergy / 1e6, 0.2));
+        document.getElementById('dm-gain').innerText = Math.max(0, dmGain);
+    }
+
+    // Игровой Таймер (Каждую секунду)
+    setInterval(() => {
+        const eps = getEps();
+        if (eps > 0) {
+            addEnergy(eps);
+            damageEnemy(eps);
         }
-    }
+        updateUI();
+    }, 1000);
 
-    function claim(type, lvl) {
-        if(lvl === 30) {
-            let id = (type === 'n') ? 'excl_norm' : 'excl_plus';
-            if(!g.owned.includes(id)) g.owned.push(id);
-            alert("ПОЗДРАВЛЯЕМ! ВЫ ПОЛУЧИЛИ: " + DB[id].n);
-        } else {
-            if(type === 'n') g.gem += 15; else openBox('free');
-        }
-        g.claimed.push(type + lvl); ui();
-    }
-
-    // --- Система Боксов ---
-    let items = 0, taps = 0;
-    function openBox(type) {
-        if(type==='en' && g.en >= 1500) g.en -= 1500;
-        else if(type==='gem' && g.gem >= 80) g.gem -= 80;
-        else if(type!=='free') return;
-        items = (type==='gem'?5:2); taps = 0;
-        document.getElementById('box-scene').style.display='flex';
-        document.getElementById('box-render').style.display='block';
-        document.getElementById('reward-pop').style.display='none';
-        document.getElementById('box-info').innerText = "КЛИКАЙ ПО БОКСУ! (3)";
-    }
-
-    function tapBox() {
-        taps++; 
-        document.getElementById('box-info').innerText = "КЛИКАЙ! (" + (3-taps) + ")";
-        if(taps >= 3) { document.getElementById('box-render').style.display='none'; nextItem(); }
-    }
-
-    function nextItem() {
-        if(items <= 0) { document.getElementById('box-scene').style.display='none'; return; }
-        items--; document.getElementById('reward-pop').style.display='block';
-        document.getElementById('box-info').innerText = "ОСТАЛОСЬ: " + items;
-        
-        let r = Math.random();
-        if(r < 0.2) {
-            let keys = Object.keys(DB).filter(k => k!=='excl_norm' && k!=='excl_plus');
-            let id = keys[Math.floor(Math.random()*keys.length)];
-            if(!g.owned.includes(id)) g.owned.push(id);
-            document.getElementById('rew-icon').innerText = DB[id].i; 
-            document.getElementById('rew-name').innerText = "БОЕЦ: " + DB[id].n;
-        } else {
-            let a = Math.floor(Math.random()*300)+50; g.en += a;
-            document.getElementById('rew-icon').innerText = "⚡"; 
-            document.getElementById('rew-name').innerText = "+"+a+" Энергии";
-        }
-        ui();
-    }
-
-    function buyPlus() { if(g.gem >= 1000) { g.gem -= 1000; g.plus = true; ui(); } }
-    function usePromo() {
-        let v = document.getElementById('promo-in').value;
-        if(v.startsWith('UP_')) {
-            try {
-                let d = JSON.parse(atob(v.replace('UP_','')));
-                if(d.type==='add_gems') g.gem += d.amt; if(d.type==='set_mult') g.mult = d.amt; 
-                alert("Код активирован!"); ui();
-            } catch(e) {}
-        } else if(v.startsWith('100en')) {
-            g.en += parseInt(v.replace('100en','')) || 0; ui();
-        }
-    }
-    function saveTxt() {
-        const blob = new Blob([JSON.stringify(g)], {type: 'text/plain'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'energy_cat_final_2026.txt';
-        a.click();
-    }
-    function loadTxt(e) {
-        const r = new FileReader();
-        r.onload = (ev) => { g = JSON.parse(ev.target.result); ui(); };
-        r.readAsText(e.target.files);
-    }
-    ui();
+    render();
+    updateUI();
 </script>
 </body>
-</html>
+            </html>
