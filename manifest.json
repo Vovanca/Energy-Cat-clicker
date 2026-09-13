@@ -1,0 +1,16 @@
+{
+  "name": "Energy Cat: Universal Ascension",
+  "short_name": "EnergyCat",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d0d12",
+  "theme_color": "#0d0d12",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://em-content.zobj.net/source/apple/354/cat_1f408.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
