@@ -2,475 +2,254 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Energy Cat: Universal Ascension (Endless RPG)</title>
-    <style>
-        :root {
-            --bg: #090a0f;
-            --panel: #131722;
-            --accent: #00f2fe;
-            --accent-purple: #9d50bb;
-            --text: #e1e6ed;
-            --gold: #ffd700;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Energy Cat: Universal Ascension (PWA Edition)</title>
+    
+    <!-- PWA Мета-теги для превращения в приложение -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d0d12">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EnergyCat">
+    <link rel="apple-touch-icon" href="https://em-content.zobj.net/source/apple/354/cat_1f408.png">
 
-        * { box-sizing: border-box; user-select: none; }
-        body {
-            margin: 0;
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Боковое меню навигации */
-        .sidebar {
-            width: 220px;
-            background: var(--panel);
-            border-right: 1px solid #232a3b;
-            display: flex;
-            flex-direction: column;
-            padding: 15px 0;
-        }
-
-        .logo {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--accent);
-            margin-bottom: 25px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: #78849e;
-            padding: 14px 20px;
-            text-align: left;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.02); }
-        .nav-btn.active {
-            color: var(--accent);
-            background: rgba(0, 242, 254, 0.05);
-            border-left-color: var(--accent);
-        }
-
-        /* Главная область */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Верхняя панель ресурсов */
-        .top-res {
-            background: var(--panel);
-            padding: 15px 30px;
-            display: flex;
-            gap: 40px;
-            border-bottom: 1px solid #232a3b;
-        }
-
-        .res-item { display: flex; flex-direction: column; }
-        .res-label { font-size: 11px; color: #6b7a99; text-transform: uppercase; }
-        .res-val { font-size: 20px; font-weight: bold; color: #fff; }
-
-        /* Вкладки */
-        .tab-content {
-            flex: 1;
-            padding: 25px;
-            overflow-y: auto;
-            display: none;
-        }
-        .tab-content.active { display: block; }
-
-        /* Кликер и Бои */
-        .clicker-layout {
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 20px;
-            height: 100%;
-        }
-
-        .canvas-card {
-            background: var(--panel);
-            border-radius: 12px;
-            border: 1px solid #232a3b;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        #gameCanvas {
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        /* Панель магазинов и построек */
-        .shop-panel {
-            background: var(--panel);
-            border-radius: 12px;
-            border: 1px solid #232a3b;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
-        }
-
-        .shop-item {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid #232a3b;
-            padding: 12px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .shop-item:hover { border-color: #3b465e; }
-
-        .btn-buy {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 8px 14px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .btn-buy:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        /* Дерево Престижа */
-        .prestige-card {
-            background: linear-gradient(135deg, #1e1035, #131722);
-            border: 1px solid var(--accent-purple);
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .btn-ascend {
-            background: var(--accent-purple);
-            color: #fff;
-            border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(157, 80, 187, 0.4);
-        }
-    </style>
+    <!-- Подключение внешних стилей -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="logo">⚡ Energy Cat</div>
-        <button class="nav-btn active" onclick="switchTab('tab-core')">🛸 Ядро и Бой</button>
-        <button class="nav-btn" onclick="switchTab('tab-buildings')">🏭 Генераторы</button>
-        <button class="nav-btn" onclick="switchTab('tab-ascend')">🌌 Перерождение</button>
-    </div>
-
-    <div class="main-content">
-        <div class="top-res">
-            <div class="res-item">
-                <span class="res-label">Энергия</span>
-                <span class="res-val" id="res-energy">0</span>
-            </div>
-            <div class="res-item">
-                <span class="res-label">Прибыль / сек</span>
-                <span class="res-val" id="res-eps" style="color:var(--accent)">0</span>
-            </div>
-            <div class="res-item">
-                <span class="res-label">Темная Материя</span>
-                <span class="res-val" id="res-dm" style="color:var(--accent-purple)">0</span>
-            </div>
-            <div class="res-item">
-                <span class="res-label">Волна</span>
-                <span class="res-val" id="res-wave" style="color:var(--gold)">1</span>
-            </div>
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ РЕСУРСОВ И СТАТУСА -->
+    <header class="top-bar">
+        <div class="res-group">
+            <div class="res-item" title="Энергия">⚡ <span id="en-val">0</span></div>
+            <div class="res-item" title="Алмазы">💎 <span id="gem-val">0</span></div>
+            <div class="res-item" title="Темная Материя">🌌 <span id="dm-val">0</span></div>
+            <div class="res-item" title="Звездная Пыль">✨ <span id="dust-val">0</span></div>
         </div>
+        <div class="top-actions">
+            <button class="icon-btn" onclick="openModal('modal-settings')" title="Настройки">⚙️</button>
+            <button class="icon-btn" onclick="openModal('modal-achievements')" title="Достижения">🏆</button>
+            <button class="icon-btn" onclick="openModal('modal-daily')" title="Ежедневный бонус">Премия 🎁</button>
+        </div>
+    </header>
 
-        <!-- 1. ЯДРО И БОЙ -->
-        <div id="tab-core" class="tab-content active">
-            <div class="clicker-layout">
-                <div class="canvas-card">
-                    <canvas id="gameCanvas" width="500" height="400"></canvas>
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР ЭКРАНОВ -->
+    <main class="app-container">
+
+        <!-- 1. ЭКРАН: ЯДРО И АВТО-БОЙ (Canvas Engine) -->
+        <section id="scr-click" class="screen active">
+            <div class="battle-header">
+                <div class="wave-info">ВОЛНА <span id="wave-num">1</span>/1000</div>
+                <div class="boss-timer-bar"><div id="boss-timer-fill"></div></div>
+            </div>
+
+            <!-- Игровой Canvas (Ядро, Враги, Эффекты) -->
+            <div class="canvas-wrapper">
+                <canvas id="gameCanvas" width="450" height="350"></canvas>
+                <div id="tap-target" class="main-cat-btn">🐱</div>
+            </div>
+
+            <div class="stats-overview">
+                <div>Урон/Клик: <b id="click-pwr">1</b></div>
+                <div>DPS Команды: <b id="team-dps">0</b></div>
+                <div>Множитель: <b id="global-mult">x1.0</b></div>
+            </div>
+
+            <div class="quest-box">
+                <div class="quest-header">
+                    <b class="highlight">БЕСКОНЕЧНЫЙ КВЕСТ</b>
+                    <span id="q-timer">00:30</span>
                 </div>
-                <div class="shop-panel">
-                    <h3>⚡ Улучшение Клика</h3>
-                    <div class="shop-item">
-                        <div>
-                            <b>Сила Клика</b><br>
-                            <small>Уровень: <span id="click-lvl">1</span></small>
-                        </div>
-                        <button class="btn-buy" id="btn-up-click" onclick="buyClickUpgrade()">15 ⚡</button>
+                <div class="quest-body">
+                    <span id="q-txt">Нажми на кота</span>: <span id="q-prog">0</span>/<span id="q-targ">100</span>
+                </div>
+                <div class="progress-bar"><div id="q-bar-fill"></div></div>
+            </div>
+        </section>
+
+        <!-- 2. ЭКРАН: КОЛЛЕКЦИЯ И ПРОКАЧКА БОЙЦОВ -->
+        <section id="scr-fighters" class="screen">
+            <div class="section-title">
+                <h3>КОЛЛЕКЦИЯ КОТОВ (<span id="f-count">0</span>/50)</h3>
+                <div class="filter-bar">
+                    <button class="filter-btn active" onclick="filterFighters('all')">Все</button>
+                    <button class="filter-btn" onclick="filterFighters('legendary')">Леги</button>
+                    <button class="filter-btn" onclick="filterFighters('cosmic')">Космос</button>
+                </div>
+            </div>
+            
+            <div class="squad-panel">
+                <h4>АКТИВНЫЙ ОТРЯД (4/4)</h4>
+                <div class="squad-slots" id="squad-slots"></div>
+            </div>
+
+            <div class="grid" id="f-grid"></div>
+        </section>
+
+        <!-- 3. ЭКРАН: ГЕНЕРАТОРЫ И ПОСТРОЙКИ (Idle Income) -->
+        <section id="scr-buildings" class="screen">
+            <h3>ЭНЕРГО-ФАБРИКИ</h3>
+            <div class="multi-buy-bar">
+                <span>Покупать по:</span>
+                <button class="buy-mode-btn active" onclick="setBuyMode(1)">x1</button>
+                <button class="buy-mode-btn" onclick="setBuyMode(10)">x10</button>
+                <button class="buy-mode-btn" onclick="setBuyMode('max')">MAX</button>
+            </div>
+            <div class="buildings-list" id="buildings-container"></div>
+        </section>
+
+        <!-- 4. ЭКРАН: ДЕРЕВО АСТРАЛЬНОГО ПЕРЕРОЖДЕНИЯ (Prestige Skill Tree) -->
+        <section id="scr-ascend" class="screen">
+            <div class="prestige-banner">
+                <h2>🌌 АСТРАЛЬНЫЙ ПРИЗЫВ</h2>
+                <p>Сжмите Вселенную, чтобы конвертировать всю Энергию в Темную Материю.</p>
+                <div class="reward-preview">Получение: <b id="dm-gain">0</b> 🌌</div>
+                <button class="btn-ascend" onclick="doAscend()">СОВЕРШИТЬ ПЕРЕРОЖДЕНИЕ</button>
+            </div>
+
+            <h3>ДЕРЕВО НАВЫКОВ</h3>
+            <div class="skill-tree-grid" id="skill-tree"></div>
+        </section>
+
+        <!-- 5. ЭКРАН: ЭКСПЕДИЦИИ И РЕЙДЫ (Автономный Лут) -->
+        <section id="scr-expeditions" class="screen">
+            <h3>КОСМИЧЕСКИЕ ЭКСПЕДИЦИИ</h3>
+            <p class="sub-text">Отправляйте свободных котов в рейды за редкими артефактами.</p>
+            <div class="expeditions-list" id="expeditions-container"></div>
+        </section>
+
+        <!-- 6. ЭКРАН: ЛАБОРАТОРИЯ И АЛХИМИЯ -->
+        <section id="scr-lab" class="screen">
+            <h3>АЛХИМИЧЕСКИЙ КОТЕЛ</h3>
+            <div class="alchemy-craft">
+                <div class="craft-slot" id="craft-slot-1">?</div>
+                <span>+</span>
+                <div class="craft-slot" id="craft-slot-2">?</div>
+                <button class="btn-action" onclick="combineItems()">СИНТЕЗИРОВАТЬ</button>
+            </div>
+            <h4>ИНВЕНТАРЬ РЕАКТИВОВ</h4>
+            <div class="grid" id="lab-inventory"></div>
+        </section>
+
+        <!-- 7. ЭКРАН: ENERGY PASS И СЕЗОНЫ -->
+        <section id="scr-pass" class="screen">
+            <div class="pass-header">
+                <b class="highlight">ENERGY PASS: СЕЗОН 12</b>
+                <div class="xp-bar"><div class="xp-fill" id="xp-f"></div></div>
+                <small>Опыт: <span id="xp-v">0</span>/500 XP (Уровень <span id="p-lvl">1</span>)</small>
+            </div>
+            <button id="buy-plus" class="btn-gold" onclick="buyPlus()">АКТИВИРОВАТЬ VIP PASS (1000 💎)</button>
+            <div class="pass-scroll" id="p-row"></div>
+        </section>
+
+        <!-- 8. ЭКРАН: МАГАЗИН И ЛУТБОКСЫ -->
+        <section id="scr-shop" class="screen">
+            <h3>ГАЛАКТИЧЕСКИЙ РЫНОК</h3>
+            <div class="shop-categories">
+                <div class="shop-section">
+                    <h4>КОСМО-БОКСЫ</h4>
+                    <div class="grid">
+                        <div class="f-card">📦 Обычный Бокс<button onclick="openBox('en')" class="btn-shop rare">1,500 ⚡</button></div>
+                        <div class="f-card">💎 Мегабокс<button onclick="openBox('gem')" class="btn-shop leg">80 💎</button></div>
+                        <div class="f-card">🌌 Астральный Бокс<button onclick="openBox('dm')" class="btn-shop myth">500 🌌</button></div>
                     </div>
                 </div>
+                <div class="shop-section">
+                    <h4>БУСТЕРЫ И УСКОРИТЕЛИ</h4>
+                    <div class="grid" id="boosters-grid"></div>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <!-- 2. ГЕНЕРАТОРЫ -->
-        <div id="tab-buildings" class="tab-content">
-            <h2>🏭 Постройки Энергии</h2>
-            <div class="shop-panel" id="buildings-list"></div>
-        </div>
-
-        <!-- 3. ПЕРЕРОЖДЕНИЕ -->
-        <div id="tab-ascend" class="tab-content">
-            <div class="prestige-card">
-                <h2>🌌 Астральное Перерождение</h2>
-                <p>Сбросьте все постройки и энергию, чтобы сжать Вселенную и получить **Темную Материю**.</p>
-                <p>Вы получите: <b id="dm-gain" style="color:var(--accent-purple); font-size: 20px;">0</b> DM</p>
-                <button class="btn-ascend" onclick="ascend()">СОВЕРШИТЬ ПЕРЕРОЖДЕНИЕ</button>
+        <!-- 9. ЭКРАН: МИНИ-ИГРЫ И КАЗИНО (Кошачья Кость) -->
+        <section id="scr-minigames" class="screen">
+            <h3>КОСМО-КАЗИНО</h3>
+            <div class="casino-card">
+                <h4>🎰 Кото-Слот</h4>
+                <div class="slot-machine">
+                    <div class="slot-reel" id="reel-1">🐱</div>
+                    <div class="slot-reel" id="reel-2">⚡</div>
+                    <div class="slot-reel" id="reel-3">💎</div>
+                </div>
+                <button class="btn-action" onclick="spinSlots()">КРУТИТЬ (50 💎)</button>
             </div>
+        </section>
+
+        <!-- 10. ЭКРАН: ПРОМОКОДЫ И СОХРАНЕНИЯ -->
+        <section id="scr-settings" class="screen">
+            <h3>ПРОМОКОДЫ И СИНХРОНИЗАЦИЯ</h3>
+            <div class="promo-box">
+                <input type="text" id="promo-in" placeholder="Введите промокод...">
+                <button onclick="usePromo()" class="btn-action">АКТИВИРОВАТЬ</button>
+            </div>
+            <hr>
+            <h4>УПРАВЛЕНИЕ СОХРАНЕНИЕМ</h4>
+            <div class="save-actions">
+                <button onclick="exportSave()" class="btn-sec">💾 Экспорт в файл (.txt)</button>
+                <button onclick="document.getElementById('file-input').click()" class="btn-sec">📂 Импорт из файла</button>
+                <input type="file" id="file-input" style="display:none" onchange="importSave(event)">
+                <button onclick="hardReset()" class="btn-danger">⚠️ Полный Сброс Прогресса</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ (ТАБЫ) -->
+    <nav class="tabs">
+        <button class="tab-btn active" onclick="tab('scr-click', this)">⚡ Бой</button>
+        <button class="tab-btn" onclick="tab('scr-fighters', this)">🐱 Коты</button>
+        <button class="tab-btn" onclick="tab('scr-buildings', this)">🏭 Заводы</button>
+        <button class="tab-btn" onclick="tab('scr-ascend', this)">🌌 Дерево</button>
+        <button class="tab-btn" onclick="tab('scr-expeditions', this)">🗺 Рейды</button>
+        <button class="tab-btn" onclick="tab('scr-lab', this)">🧪 Алхимия</button>
+        <button class="tab-btn" onclick="tab('scr-pass', this)">📜 Пасс</button>
+        <button class="tab-btn" onclick="tab('scr-shop', this)">🛒 Рынок</button>
+        <button class="tab-btn" onclick="tab('scr-minigames', this)">🎰 Игры</button>
+        <button class="tab-btn" onclick="tab('scr-settings', this)">⚙️ Инфо</button>
+    </nav>
+
+    <!-- ОВЕРЛЕЙ ОТКРЫТИЯ ЛУТБОКСОВ -->
+    <div id="box-scene" class="modal-overlay">
+        <div id="box-render" onclick="tapBox()">📦</div>
+        <div id="reward-pop">
+            <div id="rew-icon">⭐</div>
+            <h2 id="rew-name">Награда</h2>
+            <button onclick="nextItem()" class="btn-claim">ЗАБРАТЬ</button>
+        </div>
+        <div id="box-info">КЛИКАЙ ПО БОКСУ! (3)</div>
+    </div>
+
+    <!-- МОДАЛЬНЫЕ ОКНА -->
+    <div id="modal-settings" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Настройки Игры</h3>
+            <label><input type="checkbox" id="setting-sfx" checked> Звуковые эффекты</label><br>
+            <label><input type="checkbox" id="setting-particles" checked> Эффекты частиц</label><br>
+            <button onclick="closeModal('modal-settings')" class="btn-action">ЗАКРЫТЬ</button>
         </div>
     </div>
 
-<script>
-    // --- Состояние Игры ---
-    const state = {
-        energy: 0,
-        totalEnergy: 0,
-        clickPower: 1,
-        clickLvl: 1,
-        darkMatter: 0,
-        wave: 1,
-        enemyHp: 50,
-        enemyMaxHp: 50,
-        buildings: [
-            { id: 'b1', name: 'Миска с Мятой', count: 0, baseCost: 15, baseEps: 1 },
-            { id: 'b2', name: 'Лазерная Указка', count: 0, baseCost: 100, baseEps: 8 },
-            { id: 'b3', name: 'Кото-Генератор', count: 0, baseCost: 1100, baseEps: 48 },
-            { id: 'b4', name: 'Орбитальная Лавка', count: 0, baseCost: 12000, baseEps: 260 }
-        ]
-    };
+    <div id="modal-achievements" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Достижения</h3>
+            <div id="achievements-list"></div>
+            <button onclick="closeModal('modal-achievements')" class="btn-action">ЗАКРЫТЬ</button>
+        </div>
+    </div>
 
-    // --- Инициализация Canvas ---
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+    <!-- Подключение скриптов логики -->
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
 
-    let particles = [];
-
-    class Particle {
-        constructor(x, y, text, color) {
-            this.x = x; this.y = y;
-            this.text = text;
-            this.color = color;
-            this.life = 1.0;
-            this.vy = -2;
+    <!-- Регистрация Service Worker (PWA) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW зарегистрирован:', reg.scope))
+                    .catch(err => console.log('SW ошибка:', err));
+            });
         }
-        update() {
-            this.y += this.vy;
-            this.life -= 0.02;
-        }
-        draw() {
-            ctx.save();
-            ctx.globalAlpha = Math.max(0, this.life);
-            ctx.fillStyle = this.color;
-            ctx.font = 'bold 16px Segoe UI';
-            ctx.fillText(this.text, this.x, this.y);
-            ctx.restore();
-        }
-    }
-
-    // Обработка Клика
-    canvas.addEventListener('click', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        // Клик по центру (Ядро)
-        const dx = x - canvas.width / 2;
-        const dy = y - canvas.height / 2;
-        if (Math.sqrt(dx*dx + dy*dy) < 70) {
-            const gain = state.clickPower * (1 + state.darkMatter * 0.1);
-            addEnergy(gain);
-            damageEnemy(gain);
-            particles.push(new Particle(x, y, `+${formatNum(gain)}`, '#00f2fe'));
-        }
-    });
-
-    function addEnergy(amount) {
-        state.energy += amount;
-        state.totalEnergy += amount;
-    }
-
-    function damageEnemy(dmg) {
-        state.enemyHp -= dmg;
-        if (state.enemyHp <= 0) {
-            state.wave++;
-            state.enemyMaxHp = Math.round(50 * Math.pow(1.25, state.wave - 1));
-            state.enemyHp = state.enemyMaxHp;
-            addEnergy(state.enemyMaxHp * 0.5);
-        }
-    }
-
-    function getEps() {
-        let eps = 0;
-        state.buildings.forEach(b => eps += b.count * b.baseEps);
-        return eps * (1 + state.darkMatter * 0.1);
-    }
-
-    // --- Магазин и Покупки ---
-    function buyClickUpgrade() {
-        const cost = Math.round(15 * Math.pow(1.5, state.clickLvl - 1));
-        if (state.energy >= cost) {
-            state.energy -= cost;
-            state.clickLvl++;
-            state.clickPower += 1;
-            updateUI();
-        }
-    }
-
-    function buyBuilding(index) {
-        const b = state.buildings[index];
-        const cost = Math.round(b.baseCost * Math.pow(1.15, b.count));
-        if (state.energy >= cost) {
-            state.energy -= cost;
-            b.count++;
-            updateUI();
-        }
-    }
-
-    function ascend() {
-        const dmGain = Math.floor(15 * Math.pow(state.totalEnergy / 1e6, 0.2));
-        if (dmGain > 0) {
-            state.darkMatter += dmGain;
-            state.energy = 0;
-            state.clickPower = 1;
-            state.clickLvl = 1;
-            state.wave = 1;
-            state.enemyHp = 50;
-            state.buildings.forEach(b => b.count = 0);
-            switchTab('tab-core');
-            updateUI();
-        } else {
-            alert('Нужно накопить больше энергии для перерождения!');
-        }
-    }
-
-    // --- Отрисовка Игрового Мира ---
-    function render() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Ядро Клика (Кот)
-        const cx = canvas.width / 2;
-        const cy = canvas.height / 2;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, 65, 0, Math.PI * 2);
-        ctx.fillStyle = '#1c2333';
-        ctx.strokeStyle = '#00f2fe';
-        ctx.lineWidth = 4;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = '#00f2fe';
-        ctx.fill();
-        ctx.stroke();
-        ctx.restore();
-
-        ctx.font = '50px Segoe UI';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🐱', cx, cy);
-
-        // Враг / Мышь
-        ctx.fillStyle = '#e74c3c';
-        ctx.fillRect(50, 40, 400, 12);
-        ctx.fillStyle = '#2ecc71';
-        ctx.fillRect(50, 40, (state.enemyHp / state.enemyMaxHp) * 400, 12);
-
-        ctx.font = 'bold 14px Segoe UI';
-        ctx.fillStyle = '#fff';
-        ctx.fillText(`ВРАГ (Волна ${state.wave}): ${formatNum(state.enemyHp)} / ${formatNum(state.enemyMaxHp)}`, cx, 25);
-
-        // Частицы
-        particles.forEach((p, index) => {
-            p.update();
-            p.draw();
-            if (p.life <= 0) particles.splice(index, 1);
-        });
-
-        requestAnimationFrame(render);
-    }
-
-    // --- Интерфейс и Вкладки ---
-    function switchTab(id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    function formatNum(n) {
-        if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
-        if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
-        if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
-        return Math.floor(n);
-    }
-
-    function updateUI() {
-        document.getElementById('res-energy').innerText = formatNum(state.energy);
-        document.getElementById('res-eps').innerText = formatNum(getEps());
-        document.getElementById('res-dm').innerText = state.darkMatter;
-        document.getElementById('res-wave').innerText = state.wave;
-
-        // Обновление Клика
-        const clickCost = Math.round(15 * Math.pow(1.5, state.clickLvl - 1));
-        document.getElementById('click-lvl').innerText = state.clickLvl;
-        const btnClick = document.getElementById('btn-up-click');
-        btnClick.innerText = `${formatNum(clickCost)} ⚡`;
-        btnClick.disabled = state.energy < clickCost;
-
-        // Обновление Построек
-        const bList = document.getElementById('buildings-list');
-        bList.innerHTML = '';
-        state.buildings.forEach((b, index) => {
-            const cost = Math.round(b.baseCost * Math.pow(1.15, b.count));
-            bList.innerHTML += `
-                <div class="shop-item">
-                    <div>
-                        <b>${b.name}</b> (${b.count})<br>
-                        <small>+${formatNum(b.baseEps)} ⚡/сек</small>
-                    </div>
-                    <button class="btn-buy" ${state.energy < cost ? 'disabled' : ''} onclick="buyBuilding(${index})">
-                        ${formatNum(cost)} ⚡
-                    </button>
-                </div>
-            `;
-        });
-
-        // Престиж
-        const dmGain = Math.floor(15 * Math.pow(state.totalEnergy / 1e6, 0.2));
-        document.getElementById('dm-gain').innerText = Math.max(0, dmGain);
-    }
-
-    // Игровой Таймер (Каждую секунду)
-    setInterval(() => {
-        const eps = getEps();
-        if (eps > 0) {
-            addEnergy(eps);
-            damageEnemy(eps);
-        }
-        updateUI();
-    }, 1000);
-
-    render();
-    updateUI();
-</script>
+    </script>
 </body>
-            </html>
+                                                                                </html>
