@@ -1,1 +1,174 @@
+:root { 
+    --common: #bdc3c7; 
+    --rare: #3498db; 
+    --epic: #9b59b6; 
+    --mythic: #e67e22; 
+    --legendary: #f1c40f; 
+    --plus: #00ffcc;
+    --excl: #ff4757; 
+    --bg: #0d0d12; 
+    --panel: #1c1c24; 
+    --accent: #00f2fe;
+}
 
+* { box-sizing: border-box; user-select: none; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+body { 
+    background: var(--bg); 
+    color: white; 
+    margin: 0; 
+    padding: 0;
+    overflow-x: hidden; 
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Верхняя панель ресурсов */
+.top-bar { 
+    background: var(--panel); 
+    padding: 12px 15px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    position: sticky; 
+    top: 0; 
+    z-index: 1000; 
+    border-bottom: 1px solid #333; 
+}
+
+.res-group { display: flex; gap: 12px; }
+.res-item { font-weight: bold; font-size: 14px; }
+.top-actions { display: flex; gap: 6px; }
+
+.icon-btn {
+    background: #2a2a36;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* Основной контейнер */
+.app-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; }
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* Нижняя навигация */
+.tabs { 
+    position: fixed; 
+    bottom: 0; 
+    width: 100%; 
+    background: var(--panel); 
+    display: flex; 
+    justify-content: space-around; 
+    padding: 10px 0; 
+    border-top: 1px solid #333; 
+    z-index: 1000; 
+    overflow-x: auto;
+}
+
+.tab-btn { 
+    background: none; 
+    border: none; 
+    color: #777; 
+    font-size: 11px; 
+    cursor: pointer; 
+    text-transform: uppercase; 
+    white-space: nowrap;
+    padding: 6px 8px;
+    font-weight: bold;
+}
+
+.tab-btn.active { color: var(--plus); border-bottom: 2px solid var(--plus); }
+
+/* Кликер и Волна */
+.battle-header { text-align: center; margin-bottom: 10px; }
+.wave-info { font-weight: bold; color: var(--gold, #ffd700); font-size: 16px; }
+
+.canvas-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0;
+}
+
+#gameCanvas {
+    background: #15151c;
+    border-radius: 12px;
+    border: 2px solid #333;
+    max-width: 100%;
+}
+
+.main-cat-btn {
+    position: absolute;
+    font-size: 90px;
+    cursor: pointer;
+    transition: transform 0.05s;
+    filter: drop-shadow(0 0 15px rgba(0,255,204,0.3));
+}
+.main-cat-btn:active { transform: scale(0.85); }
+
+.stats-overview {
+    display: flex;
+    justify-content: space-around;
+    background: var(--panel);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+
+.quest-box { 
+    background: #1a1a20; 
+    padding: 15px; 
+    border-radius: 12px; 
+    border-left: 4px solid var(--plus); 
+}
+
+/* Сетки и карточки */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+
+.f-card { 
+    background: var(--panel); 
+    padding: 12px; 
+    border-radius: 12px; 
+    text-align: center; 
+    border: 1px solid #333; 
+}
+
+/* Кнопки */
+.btn-action, .btn-shop, .btn-claim {
+    background: var(--plus);
+    color: #000;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.btn-shop.rare { background: var(--rare); color: white; }
+.btn-shop.leg { background: var(--legendary); color: black; }
+.btn-shop.myth { background: var(--mythic); color: white; }
+
+/* Оверлей боксов и модалки */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 3000;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#box-render { font-size: 120px; cursor: pointer; }
+#reward-pop { display: none; text-align: center; background: var(--panel); padding: 30px; border-radius: 20px; border: 2px solid var(--plus); }
